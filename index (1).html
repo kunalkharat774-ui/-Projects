@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Portfolio</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace; /* Monospace font for binary feel */
+            margin: 0;
+            padding: 0;
+            background: #0c0c0c; /* Black background to match binary */
+            color: #08c408; /* Green text to match binary code */
+            transition: background 0.3s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+        #binary-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: #050505;
+        }
+        header {
+            background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black */
+            color: #00ff00; /* Green text */
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 2px solid #00ff00; /* Green border */
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,255,0,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        section {
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.7); /* Dark semi-transparent background */
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,255,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1;
+            color: #00ff00; /* Green text */
+        }
+        section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,255,0,0.4);
+        }
+        h2 {
+            border-bottom: 2px solid #00ff00; /* Green border */
+            padding-bottom: 0.5rem;
+            color: #00ff00;
+            transition: color 0.3s ease;
+        }
+        h2:hover {
+            color: #00aa00; /* Darker green on hover */
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(0, 255, 0, 0.1); /* Subtle green background */
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+        li:hover {
+            background: rgba(0, 255, 0, 0.2);
+        }
+        a {
+            color: #00ff00;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            color: #00aa00;
+            text-decoration: underline;
+        }
+        .photo-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 1rem auto;
+            display: block;
+        }
+        .photo {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #00ff00; /* Green border */
+            transition: border-color 0.3s ease;
+        }
+        .photo:hover {
+            border-color: #00aa00;
+        }
+        .name-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white; /* White text for contrast */
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8); /* Shadow for visibility */
+            background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .photo-upload {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .photo-upload input {
+            margin-top: 0.5rem;
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            position: relative;
+            z-index: 1;
+        }
+        @media (max-width: 600px) {
+            section {
+                padding: 1rem;
+            }
+            .photo-container {
+                width: 120px;
+                height: 120px;
+            }
+            .name-overlay {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="binary-bg"></canvas>
+    
+    <header>
+        <p>Hi, I'm Portfolio ! </p>
+      <marquee behaviour="scroll" direction ="left"> Welcome To My Website !</marquee>
+    </header>
+    
+    <section id="about">
+        <h2>About Me</h2>
+        <div class="photo-upload">
+            <label for="photo-input">Add Your Photo:</label>
+            <input type="file" id="photo-input" accept="image/*">
+        </div>
+        <div class="photo-container">
+            <img id="photo-preview" src="https://via.placeholder.com/150" alt="Your Photo" class="photo">
+        </div>
+        <p>I'm passionate Web Developer to creating user-friendly websites and solving problems with code. , I specialize in skills C, C++, HTML, CSS, JavaScript.</p>
+    </section>
+    
+    <section id="skills">
+        <h2>Skills</h2>
+        <ul>
+            <li>HTML & CSS</li>
+            <li>JavaScript</li>
+            <li>Responsive Design</li>
+            <li>Version Control (GitHub)</li>
+        </ul>
+    </section>
+    
+    <section id="projects">
+        <h2>Projects</h2>
+        <ul>
+            <li><strong>Project 1:</strong>  A personal blog built with HTML/CSS. </li>
+            <li><strong>Project 2:</strong>  An e-commerce site using JavaScript. </li>
+        </ul>
+    </section>
+    
+    <section id="contact">
+        <center>
+        <h2>Contact Us:</h2>
+        </center>
+        <center>
+        <p> | GitHub:- KunalKharat | </p>
+      <center>
+        <p>&copy; 2025 My Portfolio </p>
+      </center>
+    </section>
+    <script>
+        // Photo upload functionality
+        const photoInput = document.getElementById('photo-input');
+        const photoPreview = document.getElementById('photo-preview');
+
+        photoInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoPreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Binary code animation
+        const canvas = document.getElementById('binary-bg');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const binary = '01';
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff00';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = binary[Math.floor(Math.random() * binary.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 33); // ~30 FPS
+    </script>
+</body>
+</html>
