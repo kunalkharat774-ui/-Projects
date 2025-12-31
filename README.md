@@ -9,9 +9,7 @@
 
 - 🚀 Ask me about : C , C++ , HTML , CSS , Java , Termux , Kali Linux
 
-- 🖂 Email id :**kunalkharat774@gmail.com**
-
-- ▶️ Youtube Channel : https://youtube.com/@kunalkharat-j9y?si=t4QQbVEPt5OenXuU
+- 🖂 Email id :**kunalkharat281@gmail.com**
 
 <h3 align="left">Connect with me:</h3>
 <p align="left">
