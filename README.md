@@ -11,7 +11,7 @@
 
 - 🖂 Email id :**kunalkharat774@gmail.com**
 
-- ▶️ Youtube Channel :[@kunalkharat-j9y](@kunalkharat-j9y)
+- ▶️ Youtube Channel : https://youtube.com/@kunalkharat-j9y?si=t4QQbVEPt5OenXuU
 
 <h3 align="left">Connect with me:</h3>
 <p align="left">
