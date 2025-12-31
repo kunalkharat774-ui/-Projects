@@ -5,7 +5,7 @@
 
 - 👩🏻‍💻 I’m currently learning : **C , C++ , HTML , CSS , Java , Python , Termux , Kali Linux**
 
-- 🅾 Instagram id : [mh_sarkar_687](mh_sarkar_687)
+- 🅾 Instagram id : https://www.instagram.com/mh_sarkar_687
 
 - 🚀 Ask me about : C , C++ , HTML , CSS , Java , Termux , Kali Linux
 
