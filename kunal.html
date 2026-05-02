@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Accurate Finger & Hand Counter</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+
+body {
+    margin: 0;
+    background: radial-gradient(circle, #020617, #000);
+    font-family: 'Orbitron', sans-serif;
+    color: cyan;
+    text-align: center;
+}
+
+h1 {
+    margin-top: 15px;
+    text-shadow: 0 0 20px cyan;
+}
+
+.container {
+    position: relative;
+    display: inline-block;
+    margin-top: 15px;
+}
+
+video, canvas {
+    width: 720px;
+    height: 520px;
+    border-radius: 20px;
+    box-shadow: 0 0 30px cyan;
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.panel {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.card {
+    padding: 20px 30px;
+    border-radius: 15px;
+    background: rgba(0,255,255,0.08);
+    box-shadow: 0 0 20px cyan;
+}
+
+.value {
+    font-size: 38px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🧠 Hands Gesture Counter</h1>
+
+<div class="container">
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
+</div>
+
+<div class="panel">
+    <div class="card">
+        Hands
+        <div id="hands" class="value">0</div>
+    </div>
+
+    <div class="card">
+        Fingers
+        <div id="fingers" class="value">0</div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+<script>
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const handsText = document.getElementById("hands");
+const fingersText = document.getElementById("fingers");
+
+canvas.width = 720;
+canvas.height = 520;
+
+// Setup MediaPipe
+const hands = new Hands({
+    locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+});
+
+hands.setOptions({
+    maxNumHands: 2,
+    modelComplexity: 1,
+    minDetectionConfidence: 0.7,
+    minTrackingConfidence: 0.7
+});
+
+// ✅ Improved finger counting
+function countFingers(landmarks, handedness) {
+    let fingers = 0;
+
+    // Finger tips
+    const tips = [8, 12, 16, 20];
+
+    // 4 fingers (up if tip is above pip joint)
+    for (let i = 0; i < tips.length; i++) {
+        if (landmarks[tips[i]].y < landmarks[tips[i] - 2].y) {
+            fingers++;
+        }
+    }
+
+    // ✅ Thumb (fixed using handedness)
+    if (handedness === "Right") {
+        if (landmarks[4].x < landmarks[3].x) fingers++;
+    } else {
+        if (landmarks[4].x > landmarks[3].x) fingers++;
+    }
+
+    return fingers;
+}
+
+// Results
+hands.onResults(results => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+
+    let totalFingers = 0;
+    let handCount = results.multiHandLandmarks.length;
+
+    handsText.innerText = handCount;
+
+    if (results.multiHandLandmarks.length > 0) {
+        for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+
+            const landmarks = results.multiHandLandmarks[i];
+            const label = results.multiHandedness[i].label;
+
+            totalFingers += countFingers(landmarks, label);
+
+            // Draw landmarks
+            for (const point of landmarks) {
+                ctx.beginPath();
+                ctx.arc(point.x * canvas.width, point.y * canvas.height, 4, 0, 2 * Math.PI);
+                ctx.fillStyle = "#00ffff";
+                ctx.fill();
+            }
+        }
+    }
+
+    fingersText.innerText = totalFingers;
+});
+
+// Camera
+const camera = new Camera(video, {
+    onFrame: async () => {
+        await hands.send({ image: video });
+    },
+    width: 720,
+    height: 520
+});
+
+camera.start();
+</script>
+
+</body>
+</html>
