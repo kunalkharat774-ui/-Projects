@@ -1,13 +1,13 @@
 <h1 align="center">Hi 👋, I'm Kunal Kharat</h1>
-<h3 align="center">A passionate Web developer from India</h3>
+<h3 align="center">A Ethical Hacker </h3>
 
 <img align="right" alt="Coder GIF" height=250 width=300 src="https://cdn.dribbble.com/users/730703/screenshots/6581243/avento.gif" />
 
-- 👩🏻‍💻 I’m currently learning : HTML , CSS , Java , Python , Termux , Kali Linux**
+- 👩🏻‍💻 I’m currently learning : Python , Kali Linux , Networking , Application Security , Cryptography**
 
 - 🅾 Instagram id : https://www.instagram.com/mh_sarkar_687
 
-- 🚀 Ask me about : HTML , CSS , Java , Python ,Termux , Kali Linux
+- 🚀 Ask me about : Networking , Application Security , Cryptography
 
 <h3 align="left">Connect with me:</h3>
 <p align="left">
