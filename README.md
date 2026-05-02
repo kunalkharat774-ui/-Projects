@@ -1,5 +1,5 @@
 <h1 align="center">Hi 👋, I'm Kunal Kharat</h1>
-<h3 align="center">A Ethical Hacker </h3>
+<h3 align="center">A Ethical Hacker From India </h3>
 
 <img align="right" alt="Coder GIF" height=250 width=300 src="https://cdn.dribbble.com/users/730703/screenshots/6581243/avento.gif" />
 
