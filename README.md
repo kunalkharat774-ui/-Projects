@@ -16,8 +16,8 @@
 
 
 ## 🧠 My Focus Areas
-- 1. Ethical Hacking
-- 2.  Ai  With Cyber Attacks
+- 1.  Ethical Hacking
+- 2.  Threats Analysis 
 - 3.  Open Source Contribution
 
 
