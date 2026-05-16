@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Typing Monster - Defeat Monsters with Your Typing!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        /* === RESET & BASE === */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+
+        @keyframes hit-flash {
+            0% { filter: brightness(1); }
+            25% { filter: brightness(2) hue-rotate(90deg); }
+            50% { filter: brightness(0.3); }
+            75% { filter: brightness(1.5); }
+            100% { filter: brightness(1); }
+        }
+
+        @keyframes death-anim {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3) rotate(15deg); opacity: 0.5; }
+            100% { transform: scale(0) rotate(45deg); opacity: 0; }
+        }
+
+        @keyframes damage-number {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
+        }
+
+        @keyframes typing-pulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(255, 60, 60, 0.4); }
+            50% { box-shadow: 0 0 20px rgba(255, 60, 60, 0.8), 0 0 40px rgba(255, 60, 60, 0.4); }
+        }
+
+        @keyframes spawn-in {
+            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(247, 127, 0, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(247, 127, 0, 0.6), 0 0 80px rgba(230, 57, 70, 0.3); }
+        }
+
+        @keyframes combo-display {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes slide-in {
+            0% { transform: translateY(30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        /* === BODY === */
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: #0a0a12;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(60, 0, 80, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(0, 40, 80, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 0%, rgba(100, 0, 60, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* === SCREEN MANAGEMENT === */
+        .screen {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        #game-wrapper {
+            position: relative;
+            width: 900px;
+            max-width: 95vw;
+            height: 700px;
+            max-height: 95vh;
+            background: linear-gradient(145deg, #141420, #1a1a2e);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 0 40px rgba(100, 0, 200, 0.15),
+                0 0 80px rgba(0, 100, 200, 0.05),
+                inset 0 0 60px rgba(255, 255, 255, 0.02);
+            overflow: hidden;
+        }
+
+        /* === BUTTONS === */
+        .btn {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: rotate(45deg);
+            transition: 0.5s;
+        }
+
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #e63946, #c62828);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(230, 57, 70, 0.6);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-attack {
+            background: linear-gradient(135deg, #f77f00, #e85d04);
+            color: #fff;
+            padding: 14px 24px;
+            box-shadow: 0 4px 15px rgba(247, 127, 0, 0.3);
+            font-size: 16px;
+        }
+
+        .btn-attack:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(247, 127, 0, 0.5);
+        }
+
+        .btn-attack:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* === START SCREEN === */
+        #start-screen {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .start-content {
+            padding: 40px;
+            animation: slide-in 0.8s ease-out;
+        }
+
+        .game-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 42px;
+            background: linear-gradient(135deg, #f77f00, #e63946, #9b5de5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .monster-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 48px;
+            display: block;
+            background: linear-gradient(135deg, #e63946, #f77f00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .monster-preview {
+            margin: 30px 0;
+        }
+
+        .monster-icon {
+            font-size: 100px;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(230, 57, 70, 0.5));
+        }
+
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .instructions h3 {
+            color: #f77f00;
+            font-size: 20px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .instructions p {
+            color: #888;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* === HUD === */
+        #hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hud-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .hud-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 18px;
+        }
+
+        .health-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 4px 12px;
+            min-width: 180px;
+        }
+
+        .health-bar {
+            height: 12px;
+            background: linear-gradient(90deg, #e63946, #f77f00, #2ecc71);
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            min-width: 0;
+        }
+
+        #score-display {
+            color: #f1c40f;
+        }
+
+        #level-display {
+            color: #00b4d8;
+        }
+
+        /* === BATTLE ARENA === */
+        #battle-arena {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 70px);
+            padding: 20px 30px 30px;
+            position: relative;
+        }
+
+        /* Monster Area */
+        #monster-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        #monster-sprite {
+            width: 180px;
+            height: 180px;
+            margin-bottom: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .monster-body {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 40px rgba(230, 57, 70, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        /* Monster variants by type */
+        .monster-body.goblin {
+            background: radial-gradient(circle at 35% 35%, #6dbf6d, #2d6b2d);
+            border: 3px solid #4a9a4a;
+        }
+
+        .monster-body.orc {
+            background: radial-gradient(circle at 35% 35%, #8b5e3c, #4a2f1a);
+            border: 3px solid #6b4423;
+            width: 120%;
+            height: 120%;
+            margin-left: -10%;
+            margin-top: -10%;
+        }
+
+        .monster-body.skeleton {
+            background: radial-gradient(circle at 35% 35%, #e8e8e8, #a0a0a0);
+            border: 3px solid #ccc;
+        }
+
+        .monster-body.dark-elf {
+            background: radial-gradient(circle at 35% 35%, #6a0dad, #2d004d);
+            border: 3px solid #4a0080;
+        }
+
+        .monster-body.troll {
+            background: radial-gradient(circle at 35% 35%, #4a7c4f, #1a3d1d);
+            border: 3px solid #2d5a32;
+            width: 115%;
+            height: 115%;
+            margin-left: -7.5%;
+            margin-top: -7.5%;
+        }
+
+        .monster-body.vampire {
+            background: radial-gradient(circle at 35% 35%, #8b0000, #2d0000);
+            border: 3px solid #5a0000;
+        }
+
+        .monster-body.werewolf {
+            background: radial-gradient(circle at 35% 35%, #5c4033, #2d1a0e);
+            border: 3px solid #3d2b1f;
+            width: 110%;
+            height: 110%;
+            margin-left: -5%;
+            margin-top: -5%;
+        }
+
+        .monster-body.dragon {
+            background: radial-gradient(circle at 35% 35%, #ff4444, #8b0000);
+            border: 3px solid #cc0000;
+            width: 130%;
+            height: 130%;
+            margin-left: -15%;
+            margin-top: -15%;
+        }
+
+        .monster-body.demon-lord {
+            background: radial-gradient(circle at 35% 35%, #800080, #2d002d);
+            border: 3px solid #5a005a;
+            width: 140%;
+            height: 140%;
+            margin-left: -20%;
+            margin-top: -20%;
+            box-shadow: 0 0 60px rgba(128, 0, 128, 0.5);
+        }
+
+        .monster-body.lich-king {
+            background: radial-gradient(circle at 35% 35%, #00bcd4, #00343d);
+            border: 3px solid #008394;
+            box-shadow: 0 0 60px rgba(0, 188, 212, 0.4);
+        }
+
+        .monster-eye {
+            width: 20px;
+            height: 24px;
+            background: #ff0;
+            border-radius: 50%;
+            position: absolute;
+            top: 35%;
+            box-shadow: 0 0 10px rgba(255, 255, 0, 0.8);
+        }
+
+        .monster-eye.left { left: 30%; }
+        .monster-eye.right { right: 30%; }
+
+        .monster-mouth {
+            width: 50px;
+            height: 20px;
+            border-bottom: 4px solid rgba(0,0,0,0.6);
+            border-radius: 0 0 25px 25px;
+            position: absolute;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .monster-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            color: #fff;
+            margin-bottom: 12px;
+            text-shadow: 0 0 10px rgba(230, 57, 70, 0.5);
+        }
+
+        .monster-hp-bar-container {
+            width: 250px;
+            height: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 7px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .monster-hp-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #e63946, #f77f00, #2ecc71);
+            border-radius: 7px;
+            transition: width 0.5s ease;
+        }
+
+        .monster-hp-text {
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 5px;
+            font-weight: 600;
+        }
+
+        /* Typing Area */
+        #typing-area {
+            padding: 20px 0 10px;
+            text-align: center;
+        }
+
+        .word-to-type {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 32px;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(247, 127, 0, 0.5), 0 0 20px rgba(230, 57, 70, 0.3);
+            min-height: 50px;
+            letter-spacing: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .word-to-type.correct-flash {
+            color: #2ecc71;
+            text-shadow: 0 0 10px rgba(46, 204, 113, 0.5), 0 0 30px rgba(46, 204, 113, 0.3);
+        }
+
+        .word-to-type.wrong-flash {
+            color: #e63946;
+            text-shadow: 0 0 10px rgba(230, 57, 70, 0.5), 0 0 30px rgba(230, 57, 70, 0.3);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .typing-input {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 22px;
+            font-weight: 600;
+            padding: 12px 20px;
+            width: 350px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(230, 57, 70, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .typing-input:focus {
+            border-color: #f77f00;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 20px rgba(247, 127, 0, 0.2);
+            animation: typing-pulse 1.5s ease-in-out infinite;
+        }
+
+        .typing-input::placeholder {
+            color: #555;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .typing-input:disabled {
+            opacity: 0.5;
+        }
+
+        .message-box {
+            font-size: 16px;
+            color: #888;
+            min-height: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .message-box.hit {
+            color: #2ecc71;
+        }
+
+        .message-box.miss {
+            color: #e63946;
+        }
+
+        .message-box.info {
+            color: #00b4d8;
+        }
+
+        /* === EFFECTS === */
+        #effects-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .damage-number {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 32px;
+            color: #ff0;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 255, 0, 0.8);
+            animation: damage-number 1s ease-out forwards;
+        }
+
+        .damage-number.critical {
+            font-size: 48px;
+            color: #ff4444;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4);
+        }
+
+        .hit-effect {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 8px solid rgba(255, 255, 0, 0.3);
+            border-radius: 50%;
+            animation: hit-flash 0.5s ease-out forwards;
+        }
+
+        /* === COMBO DISPLAY === */
+        #combo-display {
+            position: absolute;
+            top: 20%;
+            right: 10%;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            color: #f1c40f;
+            text-shadow: 0 0 10px rgba(241, 196, 15, 0.8);
+            opacity: 0;
+            transition: all 0.3s ease;
+            animation: combo-display 0.5s ease-out;
+        }
+
+        #combo-display.active {
+            opacity: 1;
+        }
+
+        /* === GAME OVER === */
+        #gameover-screen {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+        }
+
+        .gameover-content {
+            text-align: center;
+            padding: 40px;
+            animation: slide-in 0.5s ease-out;
+        }
+
+        .gameover-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 52px;
+            background: linear-gradient(135deg, #e63946, #9b5de5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .skull-icon {
+            font-size: 80px;
+            margin: 20px 0;
+            filter: drop-shadow(0 0 20px rgba(230, 57, 70, 0.5));
+        }
+
+        .final-stats {
+            font-size: 24px;
+            color: #ccc;
+            margin: 20px 0;
+            line-height: 2;
+        }
+
+        .final-stats span {
+            color: #f1c40f;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 28px;
+        }
+
+        #gameover-message {
+            font-size: 18px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 600px) {
+            #game-wrapper {
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+                max-width: 100vw;
+            }
+
+            .game-title {
+                font-size: 24px;
+            }
+
+            .monster-text {
+                font-size: 30px;
+            }
+
+            #hud {
+                padding: 10px 15px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .hud-value {
+                font-size: 14px;
+            }
+
+            .health-bar-container {
+                min-width: 120px;
+            }
+
+            .word-to-type {
+                font-size: 22px;
+                letter-spacing: 2px;
+            }
+
+            .typing-input {
+                width: 200px;
+                font-size: 18px;
+            }
+
+            .monster-hp-bar-container {
+                width: 180px;
+            }
+
+            #monster-sprite {
+                width: 120px;
+                height: 120px;
+            }
+
+            .start-content {
+                padding: 20px;
+            }
+
+            .gameover-title {
+                font-size: 32px;
+            }
+
+            #battle-arena {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-wrapper">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <div class="start-content">
+                <h1 class="game-title">TYping <span class="monster-text">MONSTER</span></h1>
+                <p class="subtitle">Defeat monsters with the power of your typing!</p>
+                <div class="monster-preview">
+                    <div class="monster-icon">👾</div>
+                </div>
+                <button id="start-btn" class="btn btn-primary">START GAME</button>
+                <div class="instructions">
+                    <h3>How to Play</h3>
+                    <p>Type the displayed word correctly to attack the monster.</p>
+                    <p>Mistypes damage you! Defeat monsters to level up and heal.</p>
+                    <p>Each level brings harder words and tougher monsters!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <!-- HUD -->
+            <div id="hud">
+                <div class="hud-item">
+                    <span class="hud-label">Score</span>
+                    <span id="score-display" class="hud-value">0</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">Level</span>
+                    <span id="level-display" class="hud-value">1</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">HP</span>
+                    <div class="health-bar-container">
+                        <div id="health-bar" class="health-bar" style="width: 100%"></div>
+                        <span id="hp-display" class="hud-value" style="font-size:14px; min-width:65px;">100/100</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Battle Arena -->
+            <div id="battle-arena">
+                <!-- Monster Area -->
+                <div id="monster-area">
+                    <div id="monster-sprite">
+                        <div class="monster-body goblin">
+                            <div class="monster-eye left"></div>
+                            <div class="monster-eye right"></div>
+                            <div class="monster-mouth"></div>
+                        </div>
+                    </div>
+                    <div id="monster-name" class="monster-name">Goblin</div>
+                    <div class="monster-hp-bar-container">
+                        <div id="monster-hp-bar" class="monster-hp-bar" style="width: 100%"></div>
+                    </div>
+                    <div id="monster-hp-text" class="monster-hp-text">30/30</div>
+                </div>
+
+                <!-- Combo Display -->
+                <div id="combo-display"></div>
+
+                <!-- Typing Area -->
+                <div id="typing-area">
+                    <div id="word-display" class="word-to-type">cat</div>
+                    <div class="input-group">
+                        <input type="text" id="word-input" class="typing-input" placeholder="Type the word here..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+                        <button id="attack-btn" class="btn btn-attack">ATTACK</button>
+                    </div>
+                    <div id="message-box" class="message-box">Type the word and press ENTER or click ATTACK!</div>
+                </div>
+
+                <!-- Effects Container -->
+                <div id="effects-container"></div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameover-screen" class="screen">
+            <div class="gameover-content">
+                <h1 class="gameover-title">GAME OVER</h1>
+                <div class="skull-icon">💀</div>
+                <div class="final-stats">
+                    <p>Final Score: <span id="final-score">0</span></p>
+                    <p>Level Reached: <span id="final-level">1</span></p>
+                </div>
+                <p id="gameover-message">The darkness consumed you...</p>
+                <button id="restart-btn" class="btn btn-primary">PLAY AGAIN</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // TYPING MONSTER — Full Game Engine (JavaScript)
+        // Fully self-contained, no backend required
+        // ============================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            'use strict';
+
+            // --- Word Pools by Difficulty ---
+            const WORDS = {
+                easy: [
+                    'cat', 'dog', 'run', 'big', 'red', 'hat', 'cup', 'sun', 'bed', 'egg',
+                    'fish', 'star', 'ball', 'book', 'tree', 'bird', 'hand', 'door', 'bell', 'milk',
+                    'frog', 'jump', 'fast', 'cold', 'warm', 'rain', 'snow', 'blue', 'pink', 'gold'
+                ],
+                medium: [
+                    'dragon', 'shadow', 'knight', 'flame', 'storm', 'bridge', 'castle', 'forest',
+                    'silver', 'golden', 'hunter', 'shield', 'thunder', 'arrow', 'spirit', 'battle',
+                    'wizard', 'beast', 'crystal', 'danger', 'ember', 'frozen', 'garden', 'hammer',
+                    'island', 'jigsaw', 'kindle', 'legend', 'mystic', 'nights'
+                ],
+                hard: [
+                    'necromancer', 'cataclysm', 'inferno', 'leviathan', 'phantasm', 'sorcerer',
+                    'executioner', 'abyssal', 'oblivion', 'tyrannical', 'barbarian', 'cathedral',
+                    'labyrinth', 'purgatory', 'enchantment', 'excalibur', 'inquisitor', 'apocalypse',
+                    'dreadnought', 'archangel', 'blasphemous', 'chrysalis', 'doppelganger',
+                    'earthbound', 'frostmourne', 'guillotine', 'hieroglyph', 'immolation',
+                    'juggernaut', 'kaleidoscope'
+                ]
+            };
+
+            // --- Monster Definitions ---
+            const MONSTERS = [
+                { name: 'Goblin',     hp: 30,  css: 'goblin',     minLevel: 1  },
+                { name: 'Orc',        hp: 55,  css: 'orc',        minLevel: 2  },
+                { name: 'Skeleton',   hp: 40,  css: 'skeleton',   minLevel: 3  },
+                { name: 'Dark Elf',   hp: 50,  css: 'dark-elf',   minLevel: 4  },
+                { name: 'Troll',      hp: 80,  css: 'troll',      minLevel: 5  },
+                { name: 'Werewolf',   hp: 75,  css: 'werewolf',   minLevel: 7  },
+                { name: 'Vampire',    hp: 65,  css: 'vampire',    minLevel: 9  },
+                { name: 'Lich King',  hp: 120, css: 'lich-king',  minLevel: 12 },
+                { name: 'Dragon',     hp: 160, css: 'dragon',     minLevel: 15 },
+                { name: 'Demon Lord', hp: 220, css: 'demon-lord', minLevel: 20 }
+            ];
+
+            // --- DOM References ---
+            const screens = {
+                start: document.getElementById('start-screen'),
+                game: document.getElementById('game-screen'),
+                gameover: document.getElementById('gameover-screen')
+            };
+            const startBtn = document.getElementById('start-btn');
+            const restartBtn = document.getElementById('restart-btn');
+            const wordInput = document.getElementById('word-input');
+            const attackBtn = document.getElementById('attack-btn');
+            const wordDisplay = document.getElementById('word-display');
+            const messageBox = document.getElementById('message-box');
+            const scoreDisplay = document.getElementById('score-display');
+            const levelDisplay = document.getElementById('level-display');
+            const hpDisplay = document.getElementById('hp-display');
+            const healthBar = document.getElementById('health-bar');
+            const monsterHpBar = document.getElementById('monster-hp-bar');
+            const monsterHpText = document.getElementById('monster-hp-text');
+            const monsterName = document.getElementById('monster-name');
+            const monsterSprite = document.getElementById('monster-sprite');
+            const effectsContainer = document.getElementById('effects-container');
+            const comboDisplay = document.getElementById('combo-display');
+            const finalScore = document.getElementById('final-score');
+            const finalLevel = document.getElementById('final-level');
+            const gameoverMessage = document.getElementById('gameover-message');
+
+            // --- Game State ---
+            let state = {
+                score: 0,
+                level: 1,
+                hp: 100,
+                maxHp: 100,
+                monster: null,
+                currentWord: '',
+                combo: 0,
+                maxCombo: 0,
+                monstersDefeated: 0,
+                gameOver: false,
+                isProcessing: false
+            };
+
+            // --- Utility ---
+            function getWordForLevel(level) {
+                let pool;
+                if (level >= 15) pool = WORDS.hard;
+                else if (level >= 8) pool = WORDS.medium;
+                else pool = WORDS.easy;
+                return pool[Math.floor(Math.random() * pool.length)];
+            }
+
+            function getMonsterForLevel(level) {
+                const available = MONSTERS.filter(m => level >= m.minLevel);
+                if (available.length === 0) return MONSTERS[0];
+                // Weight toward higher-level monsters as level increases
+                const weights = available.map((m, i) => i + 1);
+                const totalWeight = weights.reduce((a, b) => a + b, 0);
+                let rand = Math.random() * totalWeight;
+                for (let i = 0; i < available.length; i++) {
+                    rand -= weights[i];
+                    if (rand <= 0) return { ...available[i] };
+                }
+                return { ...available[available.length - 1] };
+            }
+
+            function spawnMonster(level) {
+                const m = getMonsterForLevel(level);
+                m.hpCurrent = m.hp;
+                return m;
+            }
+
+            // --- UI Update Functions ---
+            function showScreen(name) {
+                Object.keys(screens).forEach(key => {
+                    screens[key].classList.remove('active');
+                });
+                screens[name].classList.add('active');
+            }
+
+            function updateHUD() {
+                scoreDisplay.textContent = state.score;
+                levelDisplay.textContent = state.level;
+                const hpPct = Math.max(0, (state.hp / state.maxHp) * 100);
+                healthBar.style.width = hpPct + '%';
+                hpDisplay.textContent = `${Math.max(0, Math.floor(state.hp))}/${state.maxHp}`;
+
+                // Color-code health bar
+                if (hpPct < 25) {
+                    healthBar.style.background = 'linear-gradient(90deg, #e63946, #c62828)';
+                } else if (hpPct < 50) {
+                    healthBar.style.background = 'linear-gradient(90deg, #e63946, #f77f00)';
+                } else {
+                    healthBar.style.background = 'linear-gradient(90deg, #e63946, #f77f00, #2ecc71)';
+                }
+            }
+
+            function updateMonster() {
+                if (!state.monster) return;
+                const m = state.monster;
+                monsterName.textContent = m.name;
+
+                const hpPct = Math.max(0, (m.hpCurrent / m.hp) * 100);
+                monsterHpBar.style.width = hpPct + '%';
+                monsterHpText.textContent = `${Math.max(0, Math.floor(m.hpCurrent))}/${m.hp}`;
+
+                // Update monster sprite CSS class
+                const body = monsterSprite.querySelector('.monster-body');
+                if (body) {
+                    // Reset animation to trigger reflow for new monster
+                    body.style.animation = 'none';
+                    body.className = `monster-body ${m.css}`;
+                    // Force reflow
+                    void body.offsetWidth;
+                    body.style.animation = 'float 3s ease-in-out infinite';
+                }
+            }
+
+            function updateWord() {
+                wordDisplay.textContent = state.currentWord;
+                wordDisplay.className = 'word-to-type';
+                wordInput.value = '';
+                wordInput.focus();
+            }
+
+            function showMessage(text, type) {
+                messageBox.textContent = text;
+                messageBox.className = 'message-box';
+                if (type) messageBox.classList.add(type);
+                // Auto-clear message after 3s
+                clearTimeout(messageBox._timeout);
+                messageBox._timeout = setTimeout(() => {
+                    if (messageBox.classList.contains('hit') || messageBox.classList.contains('miss')) {
+                        messageBox.className = 'message-box';
+                        messageBox.textContent = state.gameOver ? '' : 'Keep typing!';
+                    }
+                }, 3000);
+            }
+
+            function showDamageNumber(damage, isCritical) {
+                const el = document.createElement('div');
+                el.className = 'damage-number' + (isCritical ? ' critical' : '');
+                el.textContent = `-${damage}`;
+                // Random horizontal offset for visual variety
+                el.style.left = (40 + Math.random() * 20) + '%';
+                effectsContainer.appendChild(el);
+                setTimeout(() => el.remove(), 1000);
+            }
+
+            function animateMonsterHit() {
+                const body = monsterSprite.querySelector('.monster-body');
+                if (body) {
+                    body.style.animation = 'none';
+                    void body.offsetWidth;
+                    body.style.animation = 'shake 0.3s ease-in-out';
+                    // After shake, restore float
+                    setTimeout(() => {
+                        body.style.animation = 'float 3s ease-in-out infinite';
+                    }, 300);
+                }
+                // Flash effect
+                const flash = document.createElement('div');
+                flash.className = 'hit-effect';
+                effectsContainer.appendChild(flash);
+                setTimeout(() => flash.remove(), 500);
+            }
+
+            function animateMonsterDeath() {
+                const body = monsterSprite.querySelector('.monster-body');
+                if (body) {
+                    body.style.animation = 'death-anim 0.8s ease-out forwards';
+                }
+            }
+
+            function updateCombo() {
+                if (state.combo >= 2) {
+                    comboDisplay.textContent = `${state.combo}x COMBO!`;
+                    comboDisplay.className = 'active';
+                    clearTimeout(comboDisplay._timeout);
+                    comboDisplay._timeout = setTimeout(() => {
+                        comboDisplay.className = '';
+                    }, 2000);
+                } else {
+                    comboDisplay.className = '';
+                }
+            }
+
+            function flashWord(type) {
+                wordDisplay.className = 'word-to-type';
+                void wordDisplay.offsetWidth;
+                if (type === 'correct') {
+                    wordDisplay.classList.add('correct-flash');
+                } else if (type === 'wrong') {
+                    wordDisplay.classList.add('wrong-flash');
+                }
+                setTimeout(() => {
+                    wordDisplay.className = 'word-to-type';
+                }, 300);
+            }
+
+            // --- Game Logic ---
+            function initGame() {
+                state.score = 0;
+                state.level = 1;
+                state.hp = 100;
+                state.maxHp = 100;
+                state.combo = 0;
+                state.maxCombo = 0;
+                state.monstersDefeated = 0;
+                state.gameOver = false;
+                state.isProcessing = false;
+
+                state.monster = spawnMonster(1);
+                state.currentWord = getWordForLevel(1);
+
+                wordInput.disabled = false;
+                attackBtn.disabled = false;
+
+                updateHUD();
+                updateMonster();
+                updateWord();
+                showMessage('Type the word and press ENTER or click ATTACK!', 'info');
+                showScreen('game');
+            }
+
+            function handleAttack() {
+                if (state.gameOver || state.isProcessing) return;
+
+                const typed = wordInput.value.trim().toLowerCase();
+                if (!typed) {
+                    showMessage('Type something first!', 'miss');
+                    return;
+                }
+
+                state.isProcessing = true;
+                wordInput.disabled = true;
+                attackBtn.disabled = true;
+
+                const correct = typed === state.currentWord;
+
+                if (correct) {
+                    // Calculate damage based on level and combo
+                    const baseDamage = Math.max(8, 30 - state.level);
+                    const comboMultiplier = 1 + (state.combo * 0.1);
+                    const damage = Math.floor(baseDamage * comboMultiplier);
+                    const isCritical = state.combo >= 5;
+
+                    state.monster.hpCurrent -= damage;
+                    state.score += damage * (1 + Math.floor(state.level / 3));
+                    state.combo++;
+                    if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+
+                    showDamageNumber(damage, isCritical);
+                    animateMonsterHit();
+                    flashWord('correct');
+                    updateCombo();
+
+                    if (state.monster.hpCurrent <= 0) {
+                        // Monster defeated!
+                        state.monstersDefeated++;
+                        const bonus = 50 * state.level;
+                        state.score += bonus;
+                        animateMonsterDeath();
+                        showMessage(`MONSTER DEFEATED! +${bonus} bonus score!`, 'hit');
+
+                        // Spawn next monster
+                        setTimeout(() => {
+                            state.level++;
+                            // Heal player
+                            state.hp = Math.min(state.maxHp, state.hp + 25);
+                            state.monster = spawnMonster(state.level);
+                            state.currentWord = getWordForLevel(state.level);
+                            updateHUD();
+                            updateMonster();
+                            updateWord();
+                            showMessage(`Level ${state.level}! New monster appears!`, 'info');
+                            state.isProcessing = false;
+                            wordInput.disabled = false;
+                            attackBtn.disabled = false;
+                            wordInput.focus();
+                        }, 1000);
+                        // Don't re-enable until after timeout
+                        return;
+                    } else {
+                        showMessage(`Hit! ${damage} damage dealt!`, 'hit');
+                    }
+                } else {
+                    // Mistype — take damage
+                    const damage = Math.max(3, 12 - state.level);
+                    state.hp -= damage;
+                    state.combo = 0;
+                    updateCombo();
+                    flashWord('wrong');
+                    showMessage(`Mistype! You took ${damage} damage!`, 'miss');
+
+                    if (state.hp <= 0) {
+                        state.hp = 0;
+                        state.gameOver = true;
+                        updateHUD();
+                        finalScore.textContent = state.score;
+                        finalLevel.textContent = state.level;
+                        gameoverMessage.textContent = `Monsters defeated: ${state.monstersDefeated} | Max combo: ${state.maxCombo}x`;
+                        showMessage('Game Over!', 'miss');
+                        showScreen('gameover');
+                        state.isProcessing = false;
+                        wordInput.disabled = true;
+                        attackBtn.disabled = true;
+                        return;
+                    }
+                }
+
+                // Get next word (different from current if possible)
+                let newWord;
+                do {
+                    newWord = getWordForLevel(state.level);
+                } while (newWord === state.currentWord && WORDS.easy.length > 1);
+                state.currentWord = newWord;
+
+                updateHUD();
+                updateMonster();
+                updateWord();
+
+                state.isProcessing = false;
+                wordInput.disabled = false;
+                attackBtn.disabled = false;
+                wordInput.focus();
+            }
+
+            // --- Event Listeners ---
+            startBtn.addEventListener('click', initGame);
+            restartBtn.addEventListener('click', initGame);
+
+            attackBtn.addEventListener('click', handleAttack);
+
+            wordInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAttack();
+                }
+            });
+
+            // Focus input when game screen appears
+            const observer = new MutationObserver(() => {
+                if (screens.game.classList.contains('active')) {
+                    setTimeout(() => wordInput.focus(), 150);
+                }
+            });
+            observer.observe(screens.game, { attributes: true, attributeFilter: ['class'] });
+
+            // Also focus when clicking anywhere in battle arena (not on buttons)
+            document.getElementById('battle-arena').addEventListener('click', (e) => {
+                if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
+                    wordInput.focus();
+                }
+            });
+
+            console.log('🔥 Typing Monster loaded! Defeat monsters with your typing speed!');
+        });
+    </script>
+</body>
+</html>
