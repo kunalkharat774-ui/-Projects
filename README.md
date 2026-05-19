@@ -6,6 +6,8 @@
 
 <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWJ1dDE5NGx1d3ZrcnI3eXpmbHdmMjNwanloeXZ6bWRmNTlqdXR6cSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/eY1cJTWCuTC7l7IjtP/giphy.gif" alt="Banner" width="100%" />
 
+https://gifdb.com/images/high/red-light-warning-signal-80ivs0qnx2rzv4dk.gif
+
 ## 📌 About Me
 - 1. Networking
 - 2.   Python
