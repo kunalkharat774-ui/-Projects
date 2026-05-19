@@ -1,10 +1,10 @@
 <img  src="https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyMXJqdjEwOW5xam5jY3dyNjB0Nmo0bmNyNndiMzNuOXE1MnE3ajc5ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mWnDeIKilkwDcrM2VT/giphy.gif" 
   alt="GIF"
-  width="100">
+  width="90">
 
 <img src="https://capsule-render.vercel.app/api?type=waving&height=200&color=gradient&customColorList=6,11,20,29&text=Kunal%20Kharat&fontSize=48&fontColor=fff&animation=twinkling&fontAlignY=35&desc=Ethical%20Hacker&descSize=18&descAlignY=55&textBg=false"/>
 
-<img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWJ1dDE5NGx1d3ZrcnI3eXpmbHdmMjNwanloeXZ6bWRmNTlqdXR6cSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/eY1cJTWCuTC7l7IjtP/giphy.gif" alt="Banner" width="90%" />
+<img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWJ1dDE5NGx1d3ZrcnI3eXpmbHdmMjNwanloeXZ6bWRmNTlqdXR6cSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/eY1cJTWCuTC7l7IjtP/giphy.gif" alt="Banner" width="100%" />
 
 ## 📌 About Me
 - 1. Networking
