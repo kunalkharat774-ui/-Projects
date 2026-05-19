@@ -51,8 +51,6 @@
 
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)&nbsp;&nbsp;&nbsp;![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
 
-<img src="https://user-images.githubusercontent.com/74038190/212284115-f47cd8ff-2ffb-4b04-b5bf-4d1c14c0247f.gif" width="500">
-<br><br>
 <div align="center">
 
 ![Profile Views](https://komarev.com/ghpvc/?username=yourusername&color=brightgreen&style=flat-square&label=Profile+Views)
