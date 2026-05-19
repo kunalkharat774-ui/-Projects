@@ -1,6 +1,6 @@
 <img  src="https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyMXJqdjEwOW5xam5jY3dyNjB0Nmo0bmNyNndiMzNuOXE1MnE3ajc5ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mWnDeIKilkwDcrM2VT/giphy.gif" 
   alt="GIF"
-  width="600">
+  width="200">
 
 <img src="https://capsule-render.vercel.app/api?type=waving&height=200&color=gradient&customColorList=6,11,20,29&text=Kunal%20Kharat&fontSize=48&fontColor=fff&animation=twinkling&fontAlignY=35&desc=Ethical%20Hacker&descSize=18&descAlignY=55&textBg=false"/>
 
