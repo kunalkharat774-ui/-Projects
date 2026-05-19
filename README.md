@@ -31,7 +31,6 @@
 <p align="center">
   <img src="https://trophy.ryglcloud.net/?username=kunalkharat774-ui&theme=highcontrast&no-frame=true&no-bg=true&margin-w=4&cache_seconds=86400" alt="Kunal Kharat's GitHub Trophies" />
 </p>
-<img src="IMG_20260519_094743.png" alt="Projects Banner" width="100%" />
 
 ## 🛠️ Languages & Tools
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)&nbsp;&nbsp;&nbsp;![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
