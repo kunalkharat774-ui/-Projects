@@ -26,6 +26,8 @@
   <img src="https://trophy.ryglcloud.net/?username=kunalkharat774-ui&theme=highcontrast&no-frame=true&no-bg=true&margin-w=4&cache_seconds=86400" alt="Kunal Kharat's GitHub Trophies" />
 </p>
 
+<div class="tenor-gif-embed" data-postid="15574499" data-share-method="host" data-aspect-ratio="1.33891" data-width="100%"><a href="https://tenor.com/view/warning-logo-red-alert-gif-15574499">Warning Logo GIF</a>from <a href="https://tenor.com/search/warning-gifs">Warning GIFs</a></div> <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+
 ## 🛠️ Languages & Tools
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)&nbsp;&nbsp;&nbsp;![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 
