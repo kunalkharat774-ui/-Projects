@@ -1,3 +1,7 @@
+<img  src="https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyMXJqdjEwOW5xam5jY3dyNjB0Nmo0bmNyNndiMzNuOXE1MnE3ajc5ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mWnDeIKilkwDcrM2VT/giphy.gif" 
+  alt="GIF"
+  width="600">
+
 <img src="https://capsule-render.vercel.app/api?type=waving&height=200&color=gradient&customColorList=6,11,20,29&text=Kunal%20Kharat&fontSize=48&fontColor=fff&animation=twinkling&fontAlignY=35&desc=Ethical%20Hacker&descSize=18&descAlignY=55&textBg=false"/>
 
 <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWJ1dDE5NGx1d3ZrcnI3eXpmbHdmMjNwanloeXZ6bWRmNTlqdXR6cSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/eY1cJTWCuTC7l7IjtP/giphy.gif" alt="Banner" width="100%" />
@@ -26,9 +30,6 @@
   <img src="https://trophy.ryglcloud.net/?username=kunalkharat774-ui&theme=highcontrast&no-frame=true&no-bg=true&margin-w=4&cache_seconds=86400" alt="Kunal Kharat's GitHub Trophies" />
 </p>
 
-<img  src="https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyMXJqdjEwOW5xam5jY3dyNjB0Nmo0bmNyNndiMzNuOXE1MnE3ajc5ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mWnDeIKilkwDcrM2VT/giphy.gif" 
-  alt="GIF"
-  width="300">
 
 ## 🛠️ Languages & Tools
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)&nbsp;&nbsp;&nbsp;![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
