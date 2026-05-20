@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Map Clone</title>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+#topbar {
+    background: #1a73e8;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    color: white;
+}
+
+#searchBox {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    background: white;
+    color: #1a73e8;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#map {
+    height: calc(100vh - 60px);
+    width: 100%;
+}
+</style>
+</head>
+
+<body>
+
+<div id="topbar">
+    <input type="text" id="searchBox" placeholder="Search location (e.g. Nagpur)">
+    <button onclick="searchLocation()">Search</button>
+</div>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+// Initialize map
+var map = L.map('map').setView([21.1458, 79.0882], 5); // India center
+
+// OpenStreetMap tiles
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// Default marker
+var marker = L.marker([21.1458, 79.0882]).addTo(map)
+    .bindPopup("India Center")
+    .openPopup();
+
+// Search function (using Nominatim API)
+function searchLocation() {
+    let query = document.getElementById("searchBox").value;
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.length > 0) {
+                let lat = data[0].lat;
+                let lon = data[0].lon;
+
+                map.setView([lat, lon], 13);
+
+                L.marker([lat, lon]).addTo(map)
+                    .bindPopup(query)
+                    .openPopup();
+            } else {
+                alert("Location not found!");
+            }
+        });
+}
+
+// Click on map to add marker
+map.on('click', function(e) {
+    L.marker([e.latlng.lat, e.latlng.lng]).addTo(map)
+        .bindPopup("Pinned Location")
+        .openPopup();
+});
+</script>
+
+</body>
+</html>
