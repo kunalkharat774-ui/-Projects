@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Telegram Login Page UI">
+<meta name="theme-color" content="#0088cc">
+
+<!-- Telegram Icon in Browser Tab -->
+<link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg">
+
+<title>Telegram Login</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#0088cc,#005f99);
+}
+
+.container{
+    width:350px;
+    background:#fff;
+    border-radius:18px;
+    padding:35px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+}
+
+.logo{
+    width:90px;
+    height:90px;
+    margin-bottom:15px;
+}
+
+h1{
+    color:#222;
+    margin-bottom:8px;
+    font-size:28px;
+}
+
+p{
+    color:#666;
+    margin-bottom:25px;
+    font-size:14px;
+}
+
+.input-box{
+    width:100%;
+    margin-bottom:18px;
+}
+
+.input-box input{
+    width:100%;
+    padding:14px;
+    border:1px solid #ccc;
+    border-radius:10px;
+    outline:none;
+    font-size:16px;
+    transition:0.3s;
+}
+
+.input-box input:focus{
+    border-color:#0088cc;
+    box-shadow:0 0 8px rgba(0,136,204,0.3);
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:#0088cc;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+    font-weight:bold;
+}
+
+button:hover{
+    background:#0072ad;
+}
+
+.footer{
+    margin-top:18px;
+    font-size:13px;
+    color:#777;
+}
+
+.footer a{
+    color:#0088cc;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.footer a:hover{
+    text-decoration:underline;
+}
+
+@media(max-width:400px){
+    .container{
+        width:92%;
+        padding:25px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Telegram Logo -->
+    <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram Logo">
+
+    <h1>Telegram</h1>
+    <p>Login to your Telegram account</p>
+
+    <form>
+        <div class="input-box">
+            <input type="text" placeholder="Phone Number" required>
+        </div>
+
+        <div class="input-box">
+            <input type="password" placeholder="Password" required>
+        </div>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <div class="footer">
+        Don’t have an account?
+        <a href="#">Sign Up</a>
+    </div>
+
+</div>
+
+</body>
+  </html>
