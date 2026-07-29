@@ -1,8 +1,8 @@
-# SecureWatch — Web Application & API Security Dashboard
+# 🛡️ SecureWatch — Web Application & API Security Dashboard
 
 **SecureWatch** is a comprehensive, real-time cybersecurity monitoring, analysis, and threat intelligence dashboard designed to protect web applications and APIs. It combines live threat tracking, file security, URL reputation intelligence, system diagnostics, and OWASP alignment into a single intuitive control center.
 
----
+![image alt].(https://github.com/kunalkharat774-ui/-Projects/blob/ba22edd35fa4181e7515042f6c58679db0c13109/SecurityBoard.png).
 
 ## 🚀 Key Features
 
