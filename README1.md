@@ -1,6 +1,10 @@
 #  🛡️ SecureWatch — Web Application & API Security Dashboard
 
-
+<p align="center">
+  <img src="https://raw.githubusercontent.com/kunalkharat774-ui/-Projects/7f27af4bc443bee68fa68b50b7b91a7fcae00c7c/Securitydashboard.png"
+       alt="SecureWatch Dashboard"
+       width="100%">
+</p>
 
 ## 🚀 About SecureWatch
 
