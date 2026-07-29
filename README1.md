@@ -2,7 +2,9 @@
 
 **SecureWatch** is a comprehensive, real-time cybersecurity monitoring, analysis, and threat intelligence dashboard designed to protect web applications and APIs. It combines live threat tracking, file security, URL reputation intelligence, system diagnostics, and OWASP alignment into a single intuitive control center.
 
-![image alt].(https://github.com/kunalkharat774-ui/-Projects/blob/ba22edd35fa4181e7515042f6c58679db0c13109/SecurityBoard.png).
+<p align="center">
+  <img src="https://raw.githubusercontent.com/kunalkharat774-ui/-Projects/ba22edd35fa4181e7515042f6c58679db0c13109/SecurityBoard.png" alt="Security Dashboard" width="100%">
+</p>
 
 ## 🚀 Key Features
 
