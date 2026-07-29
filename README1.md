@@ -1,8 +1,38 @@
 # 🛡️ SecureWatch — Web Application & API Security Dashboard
 
-**SecureWatch** is a comprehensive, real-time cybersecurity monitoring, analysis, and threat intelligence dashboard designed to protect web applications and APIs. It combines live threat tracking, file security, URL reputation intelligence, system diagnostics, and OWASP alignment into a single intuitive control center.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/kunalkharat774-ui/-Projects/ba22edd35fa4181e7515042f6c58679db0c13109/SecurityBoard.png" alt="Security Dashboard" width="100%">
+</p>
 
-https://raw.githubusercontent.com/kunalkharat774-ui/-Projects/main/assets/SecurityBoard.gif
+## 🚀 About SecureWatch
+
+**SecureWatch** is a comprehensive, enterprise-grade, real-time cybersecurity monitoring, analysis, and threat intelligence platform designed to strengthen the security posture of modern web applications and APIs. It serves as a centralized security operations dashboard that enables developers, security teams, and organizations to continuously monitor, detect, analyze, and respond to cyber threats through an intuitive and interactive interface.
+
+The platform combines multiple security capabilities into a single control center, eliminating the need to switch between different security tools. SecureWatch provides live cyber threat visualization, malicious URL detection, file integrity analysis, vulnerability assessment, system health monitoring, and actionable security insights to help organizations identify and mitigate risks before they become critical incidents.
+
+Built with a modern cyberpunk-inspired interface, the dashboard offers real-time attack monitoring, detailed analytics, interactive charts, and intelligent threat intelligence feeds. Users can scan suspicious URLs, analyze uploaded files, inspect API endpoints, monitor security events, and review comprehensive reports that align with industry-standard security practices.
+
+SecureWatch also incorporates security best practices based on the **OWASP Top 10**, helping developers identify common vulnerabilities such as SQL Injection, Cross-Site Scripting (XSS), Broken Authentication, Security Misconfiguration, Insecure APIs, and other critical web security risks. This makes the platform suitable for security awareness, penetration testing support, secure software development, and continuous security monitoring.
+
+### ✨ Key Highlights
+
+- 🔴 Real-time Cyber Attack Monitoring Dashboard
+- 🌍 Interactive Global Threat Intelligence Map
+- 🛡️ Malicious URL Detection & Reputation Analysis
+- 📁 File Security & Malware Analysis Interface
+- 🌐 Web Application & API Security Monitoring
+- 📊 Live Security Metrics, Charts & Analytics
+- 🔍 Vulnerability Detection & Risk Assessment
+- ⚡ System Health & Performance Diagnostics
+- 🔐 Authentication & Access Security Monitoring
+- 📈 OWASP Top 10 Security Compliance Overview
+- 🚨 Security Alerts & Incident Monitoring
+- 📄 Professional Security Reports & Dashboard Analytics
+- 🎨 Modern Cyberpunk UI with Responsive Design
+- ⚙️ Fast, Lightweight, and User-Friendly Interface
+
+SecureWatch is designed to provide security professionals, developers, students, and organizations with a unified platform for monitoring cyber threats, improving application security, and gaining actionable insights into the security posture of their digital infrastructure.
+
 
 ## 🚀 Key Features
 
