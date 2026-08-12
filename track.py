@@ -104,7 +104,6 @@ COUNTRY_CODE_COORDS = {
     996: (41.2044, 74.7661), 998: (41.3775, 64.5853),
 }
 
-
 def get_location_data(phone_str):
     """Parse phone number and return location intelligence data."""
     try:
@@ -141,9 +140,8 @@ def get_location_data(phone_str):
     except Exception as e:
         return {"error": str(e)}
 
-
 # ==================== HTML TEMPLATE ====================
-HTML_TEMPLATE =""<!DOCTYPE html>
+HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -158,7 +156,6 @@ HTML_TEMPLATE =""<!DOCTYPE html>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:'Inter',sans-serif; background:linear-gradient(135deg, #001a33, #003366, #004d99, #0066cc); color:#e0f7e0; min-height:100vh; animation:bgShift 15s ease infinite; background-size:400% 400%; }
 @keyframes bgShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100%; background:radial-gradient(ellipse at 20% 50%, rgba(0,255,100,0.05) 0%, transparent 50%), radial-gradient(ellipse at 80% 50%, rgba(0,255,150,0.05) 0%, transparent 50%); pointer-events:none; z-index:0; }
 .container { max-width:1200px; margin:0 auto; padding:20px; position:relative; z-index:1; }
 header { text-align:center; padding:25px 20px 15px; }
 .logo { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:4px; }
@@ -166,59 +163,35 @@ header { text-align:center; padding:25px 20px 15px; }
 header h1 { font-size:24px; font-weight:800; background:linear-gradient(135deg,#00ff88,#00ffcc); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 header p { color:#80e0a0; font-size:13px; margin-top:2px; }
 .tabs { display:flex; gap:8px; justify-content:center; margin-bottom:18px; }
-.tab-btn { padding:10px 22px; border-radius:10px; border:1px solid rgba(0,255,100,0.15); background:rgba(0,50,100,0.6); color:#80e0a0; font-size:14px; font-weight:500; font-family:'Inter',sans-serif; cursor:pointer; transition:all 0.3s; display:flex; align-items:center; gap:8px; }
+.tab-btn { padding:10px 22px; border-radius:10px; border:1px solid rgba(0,255,100,0.15); background:rgba(0,50,100,0.6); color:#80e0a0; font-size:14px; font-weight:500; cursor:pointer; transition:all 0.3s; display:flex; align-items:center; gap:8px; }
 .tab-btn:hover { border-color:rgba(0,255,100,0.3); color:#e0f7e0; }
 .tab-btn.active { background:rgba(0,255,100,0.15); border-color:#00ff88; color:#00ff88; }
 .tab-content { display:none; }
 .tab-content.active { display:block; }
-.search-card { background:linear-gradient(145deg,rgba(0,40,80,0.9),rgba(0,20,50,0.95)); border:1px solid rgba(0,255,100,0.15); border-radius:20px; padding:25px; backdrop-filter:blur(20px); margin-bottom:20px; box-shadow:0 8px 32px rgba(0,0,0,0.3); }
+.search-card { background:linear-gradient(145deg,rgba(0,40,80,0.9),rgba(0,20,50,0.95)); border:1px solid rgba(0,255,100,0.15); border-radius:20px; padding:25px; margin-bottom:20px; box-shadow:0 8px 32px rgba(0,0,0,0.3); }
 .search-form { display:flex; gap:10px; align-items:center; }
 .input-group { flex:1; position:relative; }
-.input-group i { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#006633; font-size:14px; }
-.search-card input[type="text"] { width:100%; padding:14px 14px 14px 42px; background:rgba(0,60,100,0.6); border:1px solid rgba(0,255,100,0.2); border-radius:10px; color:#e0f7e0; font-size:15px; font-family:'Inter',sans-serif; outline:none; transition:all 0.3s; }
-.search-card input[type="text"]:focus { border-color:#00ff88; box-shadow:0 0 0 3px rgba(0,255,100,0.15); background:rgba(0,60,100,0.8); }
-.search-card input[type="text"]::placeholder { color:#409060; }
-.search-card button { padding:14px 28px; background:linear-gradient(135deg,#00cc66,#00ff88); color:#001a33; border:none; border-radius:10px; font-size:15px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer; transition:all 0.3s; display:flex; align-items:center; gap:8px; white-space:nowrap; }
-.search-card button:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(0,255,100,0.3); }
-.examples { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; align-items:center; }
-.examples span { font-size:11px; color:#409060; }
-.example-btn { padding:4px 10px; background:rgba(0,255,100,0.08); border:1px solid rgba(0,255,100,0.12); border-radius:6px; color:#80e0a0; font-size:11px; font-family:'Inter',sans-serif; cursor:pointer; transition:all 0.2s; }
-.example-btn:hover { background:rgba(0,255,100,0.15); border-color:rgba(0,255,100,0.3); color:#e0f7e0; }
+.input-group i { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#00ff88; font-size:14px; }
+.search-card input[type="text"] { width:100%; padding:14px 14px 14px 42px; background:rgba(0,60,100,0.6); border:1px solid rgba(0,255,100,0.2); border-radius:10px; color:#e0f7e0; font-size:15px; outline:none; }
+.search-card input[type="text"]:focus { border-color:#00ff88; box-shadow:0 0 0 3px rgba(0,255,100,0.15); }
+.search-card button { padding:14px 28px; background:linear-gradient(135deg,#00cc66,#00ff88); color:#001a33; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px; }
 .error { background:rgba(255,68,68,0.1); border:1px solid rgba(255,68,68,0.25); border-radius:10px; padding:12px 16px; color:#fca5a5; font-size:14px; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
 .results-grid { display:grid; grid-template-columns:1fr 1.5fr; gap:18px; }
-.info-panel { background:linear-gradient(145deg,rgba(0,40,80,0.9),rgba(0,20,50,0.95)); border:1px solid rgba(0,255,100,0.1); border-radius:18px; padding:24px; backdrop-filter:blur(20px); }
-.info-panel h2 { font-size:14px; font-weight:600; color:#80e0a0; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
-.info-panel h2 i { color:#00ff88; font-size:12px; }
+.info-panel { background:linear-gradient(145deg,rgba(0,40,80,0.9),rgba(0,20,50,0.95)); border:1px solid rgba(0,255,100,0.1); border-radius:18px; padding:24px; }
+.info-panel h2 { font-size:14px; font-weight:600; color:#80e0a0; text-transform:uppercase; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
 .info-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(0,255,100,0.05); }
-.info-item:last-child { border-bottom:none; }
 .info-label { font-size:13px; color:#409060; display:flex; align-items:center; gap:8px; }
-.info-label i { width:14px; color:#00ff88; font-size:12px; }
-.info-value { font-size:13px; font-weight:500; color:#e0f7e0; text-align:right; word-break:break-all; }
-.badge { display:inline-block; padding:2px 8px; border-radius:5px; font-size:11px; font-weight:500; }
+.info-value { font-size:13px; font-weight:500; color:#e0f7e0; text-align:right; }
+.badge { display:inline-block; padding:2px 8px; border-radius:5px; font-size:11px; }
 .badge-country { background:rgba(0,255,100,0.12); color:#00ff88; }
 .badge-carrier { background:rgba(0,255,150,0.12); color:#00ffaa; }
-.map-panel { background:linear-gradient(145deg,rgba(0,40,80,0.9),rgba(0,20,50,0.95)); border:1px solid rgba(0,255,100,0.1); border-radius:18px; padding:15px; backdrop-filter:blur(20px); min-height:380px; }
-.map-panel .folium-map, .map-panel iframe, #liveMap { width:100%; height:100%; min-height:360px; border:none; border-radius:10px; }
-#liveMap { z-index:1; }
+.map-panel { background:linear-gradient(145deg,rgba(0,40,80,0.9),rgba(0,20,50,0.95)); border:1px solid rgba(0,255,100,0.1); border-radius:18px; padding:15px; min-height:380px; }
+.map-panel .folium-map { width:100%; height:360px; border-radius:10px; }
 .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:50px 20px; text-align:center; grid-column:1/-1; }
 .empty-state i { font-size:44px; color:rgba(0,255,100,0.2); margin-bottom:14px; }
-.empty-state h3 { color:#409060; font-size:17px; font-weight:500; }
-.empty-state p { color:#306040; font-size:13px; margin-top:4px; }
+.empty-state h3 { color:#409060; font-size:17px; }
 footer { text-align:center; padding:18px; color:#306040; font-size:11px; }
-.status-bar { display:flex; gap:15px; align-items:center; flex-wrap:wrap; margin-bottom:12px; padding:10px 14px; background:rgba(0,40,80,0.7); border-radius:10px; border:1px solid rgba(0,255,100,0.08); }
-.status-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
-.status-dot.green { background:#00ff88; box-shadow:0 0 8px rgba(0,255,100,0.4); animation:pulse 1.5s infinite; }
-.status-dot.yellow { background:#fbbf24; box-shadow:0 0 8px rgba(251,191,36,0.4); }
-.status-dot.red { background:#ef4444; }
-@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
-.tracker-info { font-size:12px; color:#80e0a0; }
-.tracker-info span { color:#00ff88; font-weight:600; }
-.copy-link { padding:6px 14px; background:rgba(0,255,100,0.1); border:1px solid rgba(0,255,100,0.2); border-radius:6px; color:#80e0a0; font-size:12px; font-family:'Inter',sans-serif; cursor:pointer; transition:all 0.2s; }
-.copy-link:hover { background:rgba(0,255,100,0.2); color:#e0f7e0; }
-.target-url-box { display:flex; gap:8px; align-items:center; margin-top:8px; }
-.target-url-box input { flex:1; padding:10px 14px; background:rgba(0,60,100,0.6); border:1px solid rgba(0,255,100,0.15); border-radius:8px; color:#e0f7e0; font-size:13px; font-family:monospace; outline:none; }
-.target-url-box input:focus { border-color:#00ff88; }
-@media (max-width:768px) { .results-grid { grid-template-columns:1fr; } .search-form { flex-direction:column; } .search-card button { width:100%; justify-content:center; } header h1 { font-size:20px; } .search-card { padding:18px; } .info-panel,.map-panel { padding:15px; } .tabs { flex-direction:column; align-items:stretch; } }
+@media (max-width:768px) { .results-grid { grid-template-columns:1fr; } .search-form { flex-direction:column; } }
 </style>
 </head>
 <body>
@@ -236,12 +209,13 @@ footer { text-align:center; padding:18px; color:#306040; font-size:11px; }
 <!-- Tab 1: Number Lookup -->
 <div id="tab-lookup" class="tab-content active">
 <div class="search-card">
-<form class="search-form" method="POST" action="/" id="phoneForm">
+<form class="search-form" method="POST" action="/">
 <div class="input-group"><i class="fas fa-phone"></i>
-<input type="text" name="phone_number" id="phoneInput" placeholder="Enter phone with country code (e.g., +14155552671)" value="{{ phone_value }}" required>
+<input type="text" name="phone_number" placeholder="Enter phone with country code (e.g., +14155552671)" value="{{ phone_value or '' }}" required>
 </div>
 <button type="submit"><i class="fas fa-search"></i> Track</button>
 </form>
+</div>
 
 {% if error %}
 <div class="error"><i class="fas fa-exclamation-circle"></i> {{ error }}</div>
@@ -269,5 +243,51 @@ footer { text-align:center; padding:18px; color:#306040; font-size:11px; }
 <!-- Tab 2: Live GPS Tracker -->
 <div id="tab-live" class="tab-content">
 <div class="search-card">
-<h2 style="font-size:15px;font-weight:600;color:#80e0a0;margin-bottom:12px;display:flex;align-items:center;gap:8px;"><i class="fas fa-satellite" style="color:#00ff88;"></i> Live GPS Tracker</h2>
-<p style="font-size:13px;color:#409060;margin-bottom:14px;">
+<h2 style="font-size:15px;color:#80e0a0;margin-bottom:12px;"><i class="fas fa-satellite" style="color:#00ff88;"></i> Live GPS Tracker Module Active</h2>
+<p style="font-size:13px;color:#409060;">Socket.IO communication stream operational on Kali Linux interface.</p>
+</div>
+</div>
+
+</div>
+<footer>PhoneLocator OSINT Tool</footer>
+<script>
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + tabName).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+</script>
+</body>
+</html>
+"""
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    result = None
+    error = None
+    phone_value = ""
+    map_html = ""
+
+    if request.method == 'POST':
+        phone_value = request.form.get('phone_number', '')
+        data = get_location_data(phone_value)
+        
+        if "error" in data:
+            error = data["error"]
+        else:
+            result = data
+            # Generate Folium map
+            m = folium.Map(location=[result['latitude'], result['longitude']], zoom_start=6)
+            folium.Marker(
+                [result['latitude'], result['longitude']],
+                popup=result['location'],
+                tooltip=result['international']
+            ).add_to(m)
+            map_html = m._repr_html_()
+
+    return render_template_string(HTML_TEMPLATE, result=result, error=error, phone_value=phone_value, map_html=map_html)
+
+if __name__ == '__main__':
+    # Runs the app on port 5000 accessible locally on Kali Linux
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
