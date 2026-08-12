@@ -143,7 +143,7 @@ def get_location_data(phone_str):
 
 
 # ==================== HTML TEMPLATE ====================
-HTML_TEMPLATE = """<!DOCTYPE html>
+HTML_TEMPLATE =""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -270,4 +270,4 @@ footer { text-align:center; padding:18px; color:#306040; font-size:11px; }
 <div id="tab-live" class="tab-content">
 <div class="search-card">
 <h2 style="font-size:15px;font-weight:600;color:#80e0a0;margin-bottom:12px;display:flex;align-items:center;gap:8px;"><i class="fas fa-satellite" style="color:#00ff88;"></i> Live GPS Tracker</h2>
-<p style="font-size:13px;color:#409060;margin-bottom:14px;">When a target visits the tracking URL and gr
+<p style="font-size:13px;color:#409060;margin-bottom:14px;">
