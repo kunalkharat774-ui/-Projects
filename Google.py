@@ -444,4 +444,4 @@ if __name__ == '__main__':
     ║   Ctrl+C to stop                     ║
     ╚══════════════════════════════════════╝
     """)
-    app.run(debug=True, host='0.0.0.0', port=5000) is website mein google ka name logo properly show nahi ho raha is website mein  Google name logo aisa show hona chahiye properly
+    app.run(debug=True, host='0.0.0.0', port=5000) 
