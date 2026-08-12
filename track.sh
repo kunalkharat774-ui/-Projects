@@ -25,15 +25,14 @@ else
 fi
 
 # 3. Activate Virtual Environment and Install Requirements
-echo "[*] Installing Python packages (Flask, Flask-SocketIO, Folium, phonenumbers)..."
+echo "[*] Installing Python packages (Flask, Flask-SocketIO, phonenumbers)..."
 ./"$VENV_DIR"/bin/pip install --upgrade pip
-./"$VENV_DIR"/bin/pip install flask flask-socketio folium phonenumbers
+./"$VENV_DIR"/bin/pip install flask flask-socketio phonenumbers
 
 # 4. Create the Python application file
 echo "[*] Generating $SCRIPT_NAME..."
 cat << 'EOF' > "$SCRIPT_NAME"
 import os
-import folium
 import phonenumbers
 from phonenumbers import geocoder, carrier, timezone
 from flask import Flask, render_template_string, request
@@ -85,57 +84,6 @@ COUNTRY_CODE_COORDS = {
     86: (35.8617, 104.1954), 90: (38.9637, 35.2433), 91: (20.5937, 78.9629),
     92: (30.3753, 69.3451), 93: (33.9391, 67.7100), 94: (7.8731, 80.7718),
     95: (21.9162, 95.9560), 98: (32.4279, 53.6880),
-    212: (31.7917, -7.0926), 213: (28.0339, 1.6596), 216: (33.8869, 9.5375),
-    218: (26.3351, 17.2283), 220: (13.4432, -15.3101), 221: (14.4974, -14.4524),
-    222: (18.0731, -15.9586), 223: (17.5707, -3.9962), 224: (9.9456, -9.6966),
-    225: (7.5400, -5.5471), 226: (12.2383, -1.5616), 227: (17.6078, 8.0817),
-    228: (8.6195, 0.8248), 229: (9.3077, 2.3158), 230: (-20.3484, 57.5522),
-    231: (6.4281, -9.4295), 232: (8.4606, -11.7799), 233: (7.9465, -1.0232),
-    234: (9.0820, 8.6753), 235: (15.4542, 18.7322), 236: (6.6111, 21.0937),
-    237: (7.3697, 12.3547), 238: (16.0021, -24.0132), 240: (1.6508, 10.2679),
-    241: (-0.8037, 11.6094), 242: (-0.2280, 15.8277), 243: (-4.0383, 21.7587),
-    244: (-8.8742, 125.7275), 245: (11.8037, -15.1804), 248: (-4.6796, 55.4920),
-    249: (15.5527, 48.5164), 250: (-1.9403, 29.8739), 251: (9.1450, 40.4897),
-    252: (5.1521, 46.1996), 253: (-11.8750, 43.8722), 254: (-0.0236, 37.9062),
-    255: (-6.3690, 34.8888), 256: (1.3733, 32.2903), 257: (-3.3731, 29.9189),
-    258: (-18.6657, 35.5296), 260: (-13.1339, 27.8493), 261: (-18.7669, 46.8691),
-    262: (-20.9042, 55.5714), 263: (-19.0154, 29.1549), 264: (-22.9576, 18.4904),
-    265: (-13.1339, 27.8493), 266: (-29.6100, 28.2336), 267: (-22.3285, 24.6849),
-    268: (-26.5225, 31.4659), 290: (-24.3770, -14.3050), 291: (15.3500, 38.9667),
-    297: (-12.1676, -72.9963), 298: (62.0145, -6.7741), 299: (64.9631, -19.0208),
-    350: (36.1408, -5.3536), 351: (39.3999, -8.2245), 352: (49.8153, 6.1296),
-    353: (53.4129, -8.2439), 354: (64.9631, -19.0208), 355: (41.1533, 20.1683),
-    356: (35.9375, 14.3754), 357: (35.1264, 33.4299), 358: (61.9241, 25.7482),
-    359: (42.7339, 25.4858), 370: (55.1694, 23.8813), 371: (56.8796, 24.6032),
-    372: (58.5953, 25.0136), 373: (47.4116, 28.3699), 374: (40.0691, 45.0382),
-    375: (53.7098, 27.9534), 376: (41.6086, 21.7453), 377: (43.7628, 11.2463),
-    378: (43.9424, 12.4578), 380: (48.3794, 31.1656), 381: (44.0165, 21.0059),
-    382: (42.7087, 19.3744), 385: (45.1000, 15.2000), 386: (46.1512, 14.9955),
-    387: (43.9159, 17.6791), 389: (41.6086, 21.7453), 420: (49.8175, 15.4730),
-    421: (48.6690, 19.6990), 423: (47.1667, 9.5333), 500: (-51.7963, -59.5236),
-    501: (17.1899, -88.4976), 502: (14.6349, -90.5069), 503: (13.7942, -88.8965),
-    504: (15.2000, -86.2419), 505: (12.8654, -85.2072), 506: (9.7489, -83.7534),
-    507: (8.5379, -80.7821), 508: (46.9411, -56.2745), 509: (18.9712, -72.2852),
-    590: (16.2650, -61.5510), 591: (-16.2902, -63.5887), 592: (4.8604, -58.9302),
-    593: (-1.8312, -78.1834), 594: (3.9339, -53.0000), 595: (-23.4425, -58.4438),
-    596: (14.6415, -61.0242), 597: (3.9193, -56.0278), 598: (-32.5228, -55.7658),
-    599: (12.1696, -68.9900), 670: (-8.5500, 125.5667), 673: (4.5353, 114.7277),
-    675: (-6.3150, 143.9555), 676: (-21.2000, -175.2000), 677: (-9.4438, 159.9726),
-    678: (-16.5782, 168.2312), 679: (-17.7134, 178.0650), 680: (7.5141, 134.5825),
-    681: (-13.5920, 172.1450), 682: (-21.2370, -159.7773), 683: (-19.0544, -169.8684),
-    685: (-13.8333, -171.7500), 686: (-1.4650, 173.0110), 687: (-20.9146, 165.7778),
-    688: (-8.5300, 179.1960), 689: (-17.6797, -149.4068), 690: (-9.4536, 160.1688),
-    691: (6.8860, 158.2277), 692: (7.0930, 171.3800), 850: (39.0194, 125.7381),
-    852: (22.3193, 114.1694), 853: (22.1564, 113.5503), 855: (12.5657, 104.9910),
-    856: (19.8563, 102.4955), 880: (23.6850, 90.3563), 886: (23.6978, 120.9605),
-    960: (3.2028, 73.2207), 961: (33.8547, 35.8623), 962: (30.5852, 36.2384),
-    963: (34.8021, 38.9968), 964: (33.2232, 43.6793), 965: (29.3117, 47.4818),
-    966: (23.8859, 45.0792), 967: (15.5527, 48.5164), 968: (21.4735, 55.9754),
-    970: (31.9474, 35.2272), 971: (23.4241, 53.8478), 972: (31.0461, 34.8516),
-    973: (26.0667, 50.5577), 974: (25.3548, 51.1839), 975: (26.9314, 89.6000),
-    976: (46.8625, 103.8467), 977: (28.3949, 84.1240), 992: (38.8610, 71.2761),
-    993: (38.9697, 59.5563), 994: (40.1431, 47.5769), 995: (42.3154, 43.3569),
-    996: (41.2044, 74.7661), 998: (41.3775, 64.5853),
 }
 
 def get_location_data(phone_str):
@@ -181,9 +129,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>PhoneLocator - Number Lookup & Live GPS</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -219,7 +165,7 @@ header p { color:#80e0a0; font-size:13px; margin-top:2px; }
 .badge-country { background:rgba(0,255,100,0.12); color:#00ff88; }
 .badge-carrier { background:rgba(0,255,150,0.12); color:#00ffaa; }
 .map-panel { background:linear-gradient(145deg,rgba(0,40,80,0.9),rgba(0,20,50,0.95)); border:1px solid rgba(0,255,100,0.1); border-radius:18px; padding:15px; min-height:380px; display:flex; flex-direction:column; }
-.map-panel .folium-map { width:100%; flex-grow:1; border-radius:10px; min-height:360px; }
+.map-panel iframe { width:100%; flex-grow:1; border-radius:10px; min-height:360px; border:0; }
 .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:50px 20px; text-align:center; grid-column:1/-1; }
 .empty-state i { font-size:44px; color:rgba(0,255,100,0.2); margin-bottom:14px; }
 .empty-state h3 { color:#409060; font-size:17px; }
@@ -301,9 +247,10 @@ def index():
             error = data["error"]
         else:
             result = data
-            m = folium.Map(location=[result['latitude'], result['longitude']], zoom_start=6, width="100%", height="100%")
-            folium.Marker([result['latitude'], result['longitude']], popup=result['location'], tooltip=result['international']).add_to(m)
-            map_html = m.get_root().render()
+            lat = result['latitude']
+            lng = result['longitude']
+            # Google Maps embed iframe URL generation
+            map_html = f'<iframe src="https://maps.google.com/maps?q={lat},{lng}&z=6&output=embed" allowfullscreen></iframe>'
 
     return render_template_string(HTML_TEMPLATE, result=result, error=error, phone_value=phone_value, map_html=map_html)
 
