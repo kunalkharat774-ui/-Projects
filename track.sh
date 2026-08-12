@@ -1,3 +1,37 @@
+#!/bin/bash
+
+# ==========================================
+# PhoneLocator Setup & Launcher Script
+# Compatible with Kali Linux / Debian / Ubuntu
+# ==========================================
+
+APP_NAME="phonelocator"
+VENV_DIR="venv"
+SCRIPT_NAME="app.py"
+
+echo "[*] Initializing $APP_NAME setup on Kali Linux..."
+
+# 1. Update and install system dependencies if needed
+echo "[*] Checking system packages..."
+sudo apt-get update -y
+sudo apt-get install -y python3-pip python3-venv python3-full
+
+# 2. Setup Virtual Environment
+if [ ! -d "$VENV_DIR" ]; then
+    echo "[*] Creating virtual environment ($VENV_DIR)..."
+    python3 -m venv "$VENV_DIR"
+else
+    echo "[*] Virtual environment already exists."
+fi
+
+# 3. Activate Virtual Environment and Install Requirements
+echo "[*] Installing Python packages (Flask, Flask-SocketIO, Folium, phonenumbers)..."
+./"$VENV_DIR"/bin/pip install --upgrade pip
+./"$VENV_DIR"/bin/pip install flask flask-socketio folium phonenumbers
+
+# 4. Create the Python application file
+echo "[*] Generating $SCRIPT_NAME..."
+cat << 'EOF' > "$SCRIPT_NAME"
 import os
 import folium
 import phonenumbers
@@ -140,7 +174,6 @@ def get_location_data(phone_str):
     except Exception as e:
         return {"error": str(e)}
 
-# ==================== HTML TEMPLATE ====================
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -185,8 +218,8 @@ header p { color:#80e0a0; font-size:13px; margin-top:2px; }
 .badge { display:inline-block; padding:2px 8px; border-radius:5px; font-size:11px; }
 .badge-country { background:rgba(0,255,100,0.12); color:#00ff88; }
 .badge-carrier { background:rgba(0,255,150,0.12); color:#00ffaa; }
-.map-panel { background:linear-gradient(145deg,rgba(0,40,80,0.9),rgba(0,20,50,0.95)); border:1px solid rgba(0,255,100,0.1); border-radius:18px; padding:15px; min-height:380px; }
-.map-panel .folium-map { width:100%; height:360px; border-radius:10px; }
+.map-panel { background:linear-gradient(145deg,rgba(0,40,80,0.9),rgba(0,20,50,0.95)); border:1px solid rgba(0,255,100,0.1); border-radius:18px; padding:15px; min-height:380px; display:flex; flex-direction:column; }
+.map-panel .folium-map { width:100%; flex-grow:1; border-radius:10px; min-height:360px; }
 .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:50px 20px; text-align:center; grid-column:1/-1; }
 .empty-state i { font-size:44px; color:rgba(0,255,100,0.2); margin-bottom:14px; }
 .empty-state h3 { color:#409060; font-size:17px; }
@@ -200,13 +233,10 @@ footer { text-align:center; padding:18px; color:#306040; font-size:11px; }
 <div class="logo"><i class="fas fa-map-location-dot"></i><h1>PhoneLocator</h1></div>
 <p>OSINT Phone Number Lookup + Live GPS Tracking</p>
 </header>
-
 <div class="tabs">
 <button class="tab-btn active" onclick="switchTab('lookup')"><i class="fas fa-search"></i> Number Lookup</button>
 <button class="tab-btn" onclick="switchTab('live')"><i class="fas fa-satellite"></i> Live GPS Tracker</button>
 </div>
-
-<!-- Tab 1: Number Lookup -->
 <div id="tab-lookup" class="tab-content active">
 <div class="search-card">
 <form class="search-form" method="POST" action="/">
@@ -216,11 +246,9 @@ footer { text-align:center; padding:18px; color:#306040; font-size:11px; }
 <button type="submit"><i class="fas fa-search"></i> Track</button>
 </form>
 </div>
-
 {% if error %}
 <div class="error"><i class="fas fa-exclamation-circle"></i> {{ error }}</div>
 {% endif %}
-
 <div class="results-grid">
 {% if result %}
 <div class="info-panel">
@@ -239,15 +267,12 @@ footer { text-align:center; padding:18px; color:#306040; font-size:11px; }
 {% endif %}
 </div>
 </div>
-
-<!-- Tab 2: Live GPS Tracker -->
 <div id="tab-live" class="tab-content">
 <div class="search-card">
 <h2 style="font-size:15px;color:#80e0a0;margin-bottom:12px;"><i class="fas fa-satellite" style="color:#00ff88;"></i> Live GPS Tracker Module Active</h2>
 <p style="font-size:13px;color:#409060;">Socket.IO communication stream operational on Kali Linux interface.</p>
 </div>
 </div>
-
 </div>
 <footer>PhoneLocator OSINT Tool</footer>
 <script>
@@ -272,22 +297,21 @@ def index():
     if request.method == 'POST':
         phone_value = request.form.get('phone_number', '')
         data = get_location_data(phone_value)
-        
         if "error" in data:
             error = data["error"]
         else:
             result = data
-            # Generate Folium map
-            m = folium.Map(location=[result['latitude'], result['longitude']], zoom_start=6)
-            folium.Marker(
-                [result['latitude'], result['longitude']],
-                popup=result['location'],
-                tooltip=result['international']
-            ).add_to(m)
-            map_html = m._repr_html_()
+            m = folium.Map(location=[result['latitude'], result['longitude']], zoom_start=6, width="100%", height="100%")
+            folium.Marker([result['latitude'], result['longitude']], popup=result['location'], tooltip=result['international']).add_to(m)
+            map_html = m.get_root().render()
 
     return render_template_string(HTML_TEMPLATE, result=result, error=error, phone_value=phone_value, map_html=map_html)
 
 if __name__ == '__main__':
-    # Runs the app on port 5000 accessible locally on Kali Linux
     socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+EOF
+
+# 5. Launch the application
+echo "[*] Starting PhoneLocator application..."
+echo "[*] Open your browser and go to: http://127.0.0.1:5000"
+./"$VENV_DIR"/bin/python3 "$SCRIPT_NAME"
