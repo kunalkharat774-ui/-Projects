@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ============================================================
-#  HACKERHUB — FakeTube + FreeFire Quiz (Unified)
-#  Works in Termux. Serves HTML on http://localhost:8080
+#  HACKERHUB — FakeTube + FreeFire Quiz (Unified for Kali Linux)
+#  Serves HTML on http://localhost:8080
 # ============================================================
 
 set -euo pipefail
@@ -15,19 +15,21 @@ W='\033[1;37m'; D='\033[0;37m'; NC='\033[0m'
 BASE_DIR="$HOME/hackerhub"
 HTML_FILE="$BASE_DIR/index.html"
 PORT=8080
-TERMUX_BROWSER=""
+BROWSER_CMD=""
 
-# detect browser
-for b in termux-open xdg-open open firefox chromium google-chrome; do
+# Detect available desktop browser in Kali Linux
+for b in xdg-open firefox chromium google-chrome Brave-browser; do
     if command -v "$b" &>/dev/null; then
-        TERMUX_BROWSER="$b"
+        BROWSER_CMD="$b"
         break
     fi
 done
-[[ -z "$TERMUX_BROWSER" && -f /data/data/com.termux/files/usr/bin/termux-open ]] && TERMUX_BROWSER="termux-open"
 
 # ---------- cleanup ----------
-cleanup() { echo -e "\n${G}[*]${NC} Goodbye!"; exit 0; }
+cleanup() { 
+    echo -e "\n${G}[*]${NC} Shutting down HackerHub..."
+    exit 0 
+}
 trap cleanup SIGINT SIGTERM
 
 # ---------- ensure dir ----------
@@ -590,7 +592,6 @@ function initQuiz(){
   document.getElementById('quiz-review').innerHTML='';
   renderCategories();
   renderQuestion();
-  updateStats();
 }
 
 function renderCategories(){
@@ -723,539 +724,25 @@ initQuiz();
 HTMLEOF
 }
 
-# ============================================================
-#  GENERATE BASH FAKETUBE
-# ============================================================
-generate_bash_faketube() {
-cat > "$BASE_DIR/faketube.sh" << 'BASHFAKETUBE'
-#!/bin/bash
-set -euo pipefail
+# Generate files
+echo -e "${C}[*]${NC} Generating HackerHub files for Kali Linux..."
+generate_html
 
-R='\033[1;31m'; G='\033[1;32m'; Y='\033[1;33m'
-B='\033[1;34m'; M='\033[1;35m'; C='\033[1;36m'; W='\033[1;37m'; D='\033[0;37m'; NC='\033[0m'
+# Start web server
+echo -e "${G}[*]${NC} Starting web server on http://localhost:$PORT..."
+cd "$BASE_DIR"
 
-# Dummy video database
-declare -a TITLES=(
-  "FREE FIRE BEST HEADSHOT TRICKS 2025"
-  "NEW CHARACTER ABILITY TIER LIST"
-  "BOOYAH! 50 KILL SOLO RUSH GAMEPLAY"
-  "ALL NEW EVOLUTION WEAPONS 2025"
-  "BERMUDA MAP SECRET SPOTS"
-  "FREE FIRE VS PUBG MOBILE"
-  "HOW TO GET DIAMONDS FOR FREE"
-  "CLASH SQUAD RANKED TIPS"
-  "NEW PET ABILITIES FULL GUIDE"
-  "BERMUDA REMASTERED COMPARISON"
-  "TOP 10 WEAPONS FOR CLASH SQUAD"
-  "PRO PLAYER SETTINGS YOU MUST USE"
-)
-declare -a CHANNELS=(
-  "FreeFire Pro" "FF Insider" "RushGamer" "WeaponMaster"
-  "MapExplorer" "GameCompare" "FF Hacks" "SquadLeader"
-  "PetMaster" "FF Streams" "Weapons Lab" "Settings Pro"
-)
-declare -a VIEWS=(
-  "2.3M" "1.8M" "4.1M" "892K" "1.2M" "5.6M"
-  "3.4M" "756K" "523K" "2.1M" "980K" "1.5M"
-)
-declare -a ICONS=("🎯" "📊" "🔥" "⚔️" "🗺️" "💥" "💎" "👥" "🐾" "🏝️" "🔫" "⚙️")
-
-declare -a COMMENTS=(
-  "Best headshot tricks ever! Got 3 booyahs today!"
-  "Bro this is insane 🔥🔥🔥"
-  "Thanks! My gameplay improved so much"
-  "Who else wants a new map? 🙋"
-  "My record is 32 kills in ranked!"
-  "The free diamonds trick actually works!"
-  "Clash Squad tips got me to Heroic!"
-  "Playing since 2019, still learning!"
-  "Just started, very helpful thanks!"
-  "Grandmaster here! Anyone squad up?"
-)
-declare -a COMMENTERS=("@booyahking" "@fffan21" "@gamerpro_ff" "@squad_leader" "@hdshot_machine" "@diamond_hunter" "@csquad_yt" "@ff_legend" "@new_player" "@rank_pusher")
-
-recomended_count=5
-current_idx=0
-is_playing=0
-progress=0
-
-draw_header() {
-  clear
-  echo -e "${R}╔══════════════════════════════════════════════════╗${NC}"
-  echo -e "${R}║  ${W}██╗   ██╗████████╗${R}██╗   ██╗${W}██████╗ ███████╗${R}  ║${NC}"
-  echo -e "${R}║  ${W}╚██╗ ██╔╝╚══██╔══╝${R}██║   ██║${W}██╔══██╗██╔════╝${R}  ║${NC}"
-  echo -e "${R}║  ${W} ╚████╔╝    ██║   ${R}██║   ██║${W}██████╔╝█████╗${R}    ║${NC}"
-  echo -e "${R}║  ${W}  ╚██╔╝     ██║   ${R}██║   ██║${W}██╔══██╗██╔══╝${R}    ║${NC}"
-  echo -e "${R}║  ${W}   ██║      ██║   ${R}╚██████╔╝${W}██████╔╝███████╗${R}  ║${NC}"
-  echo -e "${R}║  ${W}   ╚═╝      ╚═╝    ${R} ╚═════╝ ${W}╚═════╝ ╚══════╝${R}  ║${NC}"
-  echo -e "${R}╚══════════════════════════════════════════════════╝${NC}"
-  echo -e "${D}  🔍 Search: ${W}$1${NC}"
-  echo ""
-}
-
-search_videos() {
-  local query="$1"
-  local -a results=()
-  for i in "${!TITLES[@]}"; do
-    title_lower=$(echo "${TITLES[$i]}" | tr '[:upper:]' '[:lower:]')
-    query_lower=$(echo "$query" | tr '[:upper:]' '[:lower:]')
-    if [[ "$title_lower" == *"$query_lower"* ]]; then
-      results+=("$i")
-    fi
-  done
-  echo "${results[@]}"
-}
-
-show_trending() {
-  draw_header "Trending 🔥"
-  echo -e "${Y}══════════════════ TRENDING NOW ══════════════════${NC}\n"
-  for i in "${!TITLES[@]}"; do
-    echo -e "  ${R}▶${NC} ${W}${TITLES[$i]}${NC}"
-    echo -e "     ${C}${CHANNELS[$i]}${NC}  ${D}${VIEWS[$i]} views${NC}"
-    echo ""
-  done
-  echo -e "${Y}═══════════════════════════════════════════════════${NC}"
-}
-
-show_subscriptions() {
-  draw_header "Subscriptions"
-  echo -e "${M}═══════════════ YOUR SUBSCRIPTIONS ═══════════════${NC}\n"
-  local subs=("FreeFire Pro" "FF Insider" "RushGamer" "GameCompare" "SquadLeader")
-  for s in "${subs[@]}"; do
-    echo -e "  ${G}●${NC} ${W}$s${NC} ${D}• Subscribed${NC}"
-  done
-  echo ""
-  echo -e "${D}  [Showing latest uploads from your subscriptions]${NC}"
-  echo ""
-  for i in 0 1 2 4; do
-    echo -e "  ${R}▶${NC} ${W}${TITLES[$i]}${NC}"
-    echo -e "     ${D}${VIEWS[$i]} views • 2 hours ago${NC}"
-  done
-}
-
-watch_video() {
-  local idx=$1
-  current_idx=$idx
-  is_playing=0
-  progress=0
-  
-  while true; do
-    clear
-    echo -e "${R}╔══════════════════════════════════════════════════╗${NC}"
-    echo -e "${R}║${NC}  ${W}🎬 NOW PLAYING${NC}                                  ${R}║${NC}"
-    echo -e "${R}╚══════════════════════════════════════════════════╝${NC}\n"
-    echo -e "  ${W}${TITLES[$idx]}${NC}"
-    echo -e "  ${C}${CHANNELS[$idx]}${NC}  ${D}${VIEWS[$idx]} views${NC}\n"
-    
-    # Video player
-    width=50
-    played=$((progress * width / 100))
-    remaining=$((width - played))
-    echo -ne "  [${R}"
-    for ((j=0; j<played; j++)); do echo -n "█"; done
-    echo -ne "${NC}"
-    for ((j=0; j<remaining; j++)); do echo -n "▒"; done
-    echo -e "] ${W}${progress}%${NC}"
-    
-    if [[ $is_playing -eq 1 ]]; then
-      echo -e "\n  ${G}⏸ PAUSED${NC}  [p] play/pause  [b] back  [q] quit"
-    else
-      echo -e "\n  ${R}▶ PLAYING${NC}  [p] play/pause  [b] back  [q] quit"
-    fi
-    
-    # Simulate progress
-    if [[ $is_playing -eq 0 && $progress -lt 100 ]]; then
-      sleep 0.5
-      progress=$((progress + 2))
-      [[ $progress -gt 100 ]] && progress=100
-    fi
-    
-    # Comments
-    echo -e "\n${Y}─── Comments ───${NC}"
-    for c in $(seq 0 4); do
-      echo -e "  ${W}${COMMENTERS[$c]}${NC}"
-      echo -e "  ${D}${COMMENTS[$c]}${NC}\n"
-    done
-    
-    read -t 0.5 -n 1 key || true
-    if [[ -n "$key" ]]; then
-      case "$key" in
-        p) [[ $is_playing -eq 0 ]] && is_playing=1 || is_playing=0 ;;
-        b) return ;;
-        q) echo -e "\n${R}Exiting...${NC}"; exit 0 ;;
-      esac
-    fi
-  done
-}
-
-main_menu() {
-  local search_query=""
-  while true; do
-    draw_header "$search_query"
-    echo -e "  ${W}[1]${NC} 🔥 Trending"
-    echo -e "  ${W}[2]${NC} 📺 Subscriptions"
-    echo -e "  ${W}[3]${NC} 🔍 Search"
-    echo -e "  ${W}[4]${NC} 🎬 Watch a Video"
-    echo -e "  ${W}[5]${NC} 🚪 Exit"
-    echo ""
-    
-    # Show video grid
-    echo -e "${Y}─── Recommended Videos ───${NC}\n"
-    for i in $(seq 0 $((recomended_count - 1))); do
-      echo -e "  ${ICONS[$i]}  ${W}${TITLES[$i]}${NC}"
-      echo -e "     ${C}${CHANNELS[$i]}${NC}  ${D}${VIEWS[$i]} views${NC}"
-    done
-    
-    echo ""
-    read -p $'  \033[1;33mChoose option [1-5]: \033[0m' choice
-    
-    case "$choice" in
-      1) show_trending; read -p $'\n  Press Enter to continue...' ;;
-      2) show_subscriptions; read -p $'\n  Press Enter to continue...' ;;
-      3) read -p $'  \033[1;36mSearch: \033[0m' query
-         search_query="$query"
-         results=($(search_videos "$query"))
-         if [[ ${#results[@]} -eq 0 ]]; then
-           echo -e "\n  ${R}No results found${NC}"
-           sleep 1
-         else
-           echo -e "\n  ${G}${#results[@]} results found${NC}\n"
-           for idx in "${results[@]}"; do
-             echo -e "  [${idx}] ${ICONS[$idx]} ${W}${TITLES[$idx]}${NC}"
-           done
-           echo ""
-           read -p $'  \033[1;33mEnter number to watch: \033[0m' vid_choice
-           if [[ -n "$vid_choice" ]]; then
-             watch_video "$vid_choice"
-           fi
-         fi ;;
-      4) echo ""
-         for i in "${!TITLES[@]}"; do
-           echo -e "  [${i}] ${ICONS[$i]} ${W}${TITLES[$i]}${NC}"
-         done
-         echo ""
-         read -p $'  \033[1;33mEnter number to watch: \033[0m' vid_choice
-         if [[ -n "$vid_choice" && "$vid_choice" -ge 0 && "$vid_choice" -lt ${#TITLES[@]} ]]; then
-           watch_video "$vid_choice"
-         fi ;;
-      5) echo -e "\n  ${R}Goodbye!${NC}"; exit 0 ;;
-      *) echo -e "\n  ${R}Invalid option${NC}"; sleep 0.8 ;;
-    esac
-  done
-}
-
-main_menu
-BASHFAKETUBE
-chmod +x "$BASE_DIR/faketube.sh"
-}
-
-# ============================================================
-#  GENERATE BASH QUIZ
-# ============================================================
-generate_bash_quiz() {
-cat > "$BASE_DIR/freefire_quiz.sh" << 'BASHQUIZ'
-#!/bin/bash
-set -euo pipefail
-
-R='\033[1;31m'; G='\033[1;32m'; Y='\033[1;33m'
-B='\033[1;34m'; M='\033[1;35m'; C='\033[1;36m'; W='\033[1;37m'; D='\033[0;37m'; NC='\033[0m'
-
-declare -a Q=(
-  "Which weapon has highest headshot damage?" "AWM" "M82B" "Woodpecker" "Kar98k" "1"
-  "Magazine capacity of M249?" "100" "120" "150" "80" "1"
-  "Which weapon uses .50 caliber rounds?" "M82B" "AWM" "M24" "SVD" "0"
-  "Fire rate of MP40?" "83" "78" "90" "75" "2"
-  "Fastest reload SMG?" "MP5" "Vector" "UMP" "PP Bizon" "1"
-  "Woodpecker is which type?" "AR" "Shotgun" "Pistol" "Sniper" "2"
-  "Best recoil reduction attachment?" "Foregrip" "Silencer" "Muzzle" "Stock" "0"
-  "Hayato's awakening ability?" "Bushido" "Blazing" "Gunslinger" "Raging" "0"
-  "'Drop The Beat' character?" "DJ Alok" "Kla" "Jai" "Sonia" "0"
-  "Chrono's ability?" "Shield" "Heal" "Speed" "Revive" "0"
-  "Medic with 'Healing Heart'?" "Kla" "Antonio" "Miguel" "Jota" "1"
-  "Wukong's ability?" "Invisibility" "Clone" "Wall hack" "Shield" "1"
-  "'Riptide Rhythm' character?" "Thiva" "Sonia" "Dimitri" "Shani" "0"
-  "Steffie reduces damage from?" "Grenades" "Bullets" "Gloo walls" "Vehicles" "0"
-  "Smallest map?" "Kalahari" "Bermuda" "Purgatory" "Alpine" "0"
-  "How many Bermuda locations?" "10" "12" "8" "14" "1"
-  "Map added in OB35?" "NeXTerra" "Kalahari" "Bermuda Remastered" "Alpine" "0"
-  "Kalahari is based on?" "Sahara" "Kalahari" "Gobi" "Mojave" "1"
-  "Bermuda exclusive air drop weapon?" "AWM" "M249" "M79" "Flame Thrower" "0"
-  "Clash Squad players?" "8" "4" "6" "10" "0"
-  "Mr. Waggor does what?" "Spawns gloo" "Heals" "Detects" "Damage" "0"
-  "'Panda's Blessing' pet?" "Bea" "Panda" "Rocky" "Finny" "0"
-  "Max pet level?" "10" "7" "15" "5" "0"
-  "Pet that detects enemies?" "Detective Panda" "Ottero" "Robo" "Falco" "0"
-  "Dr. Beanie is known for?" "Healing" "Shielding" "Scanning" "Speed" "2"
-  "How many pet slots?" "3" "2" "4" "1" "0"
-  "Highest rank?" "Grandmaster" "Heroic" "Master" "Legendary" "0"
-  "Points from Master to Heroic?" "600" "400" "800" "500" "0"
-  "Rank requiring 1000 points?" "Grandmaster" "Heroic" "Master" "Legendary" "2"
-  "How many ranked tiers?" "7" "6" "8" "5" "1"
-  "Lowest ranked tier?" "Bronze" "Silver" "Gold" "Platinum" "0"
-  "Points lost for 8th place?" "35" "25" "45" "40" "0"
-  "Rank after Diamond?" "Heroic" "Master" "Grandmaster" "Platinum" "0"
-  "Free Fire's battle pass name?" "Elite Pass" "Premium Pass" "Battle Pass" "Gold Pass" "0"
-  "Free Fire developer?" "111 Dots Studio" "Garena" "Tencent" "Krafton" "1"
-  "Global release year?" "2017" "2016" "2018" "2019" "0"
-  "Max players in BR match?" "52" "50" "60" "48" "0"
-  "How many grenade types?" "4" "3" "5" "6" "0"
-  "Ranked event mode name?" "Clash Squad" "Bomb Squad" "Team Strike" "Rampage" "1"
-  "Fastest vehicle?" "Motorcycle" "SUV" "Jeep" "Buggy" "0"
-)
-TOTAL_QS=40
-declare -a ANSWERS=()
-score=0
-current=0
-RANKS=("GRANDMASTER" "HEROIC" "MASTER" "DIAMOND" "PLATINUM" "GOLD" "SILVER" "BRONZE")
-RANK_EMOJI=("🏆" "🥇" "🥈" "💎" "🥉" "⭐" "🌙" "🪨")
-
-get_question() {
-  local idx=$1
-  local base=$((idx * 6))
-  echo "${Q[$base]}"
-}
-get_opt() {
-  local idx=$1; local opt=$2
-  local base=$((idx * 6))
-  echo "${Q[$((base + 1 + opt))]}"
-}
-get_answer() {
-  local idx=$1
-  local base=$((idx * 6))
-  echo "${Q[$((base + 5))]}"
-}
-get_rank() {
-  local pct=$1
-  if [[ $pct -eq 100 ]]; then echo 0
-  elif [[ $pct -ge 90 ]]; then echo 1
-  elif [[ $pct -ge 75 ]]; then echo 2
-  elif [[ $pct -ge 60 ]]; then echo 3
-  elif [[ $pct -ge 45 ]]; then echo 4
-  elif [[ $pct -ge 30 ]]; then echo 5
-  elif [[ $pct -ge 15 ]]; then echo 6
-  else echo 7; fi
-}
-
-show_banner() {
-  clear
-  echo -e "${R}╔══════════════════════════════════════════════╗${NC}"
-  echo -e "${R}║${NC}  ${Y}🔥 FREE FIRE MCQ CHALLENGE 🔥${NC}           ${R}║${NC}"
-  echo -e "${R}╚══════════════════════════════════════════════╝${NC}"
-  echo ""
-}
-
-run_quiz() {
-  score=0; current=0; ANSWERS=()
-  
-  while [[ $current -lt $TOTAL_QS ]]; do
-    show_banner
-    local q="$(get_question $current)"
-    local pct=$((current * 100 / TOTAL_QS))
-    
-    echo -e "  ${W}Question $((current + 1))/${TOTAL_QS}${NC}"
-    echo -e "  ${Y}Progress: [${NC}"
-    for ((i=0; i<50; i++)); do
-      if [[ $i -lt $((pct / 2)) ]]; then echo -ne "${G}█${NC}"
-      else echo -ne "${D}▒${NC}"; fi
-    done
-    echo -e "${Y}] ${pct}%${NC}\n"
-    echo -e "  ${W}${q}${NC}\n"
-    
-    local letters=("A" "B" "C" "D")
-    for opt in 0 1 2 3; do
-      echo -e "    ${C}${letters[$opt]}.${NC} $(get_opt $current $opt)"
-    done
-    
-    echo ""
-    read -p $'  \033[1;33mYour answer [A-D]: \033[0m' ans
-    ans=$(echo "$ans" | tr '[:lower:]' '[:upper:]')
-    
-    local correct_idx
-    case "$ans" in
-      A) correct_idx=0 ;; B) correct_idx=1 ;; C) correct_idx=2 ;; D) correct_idx=3 ;;
-      *) echo -e "\n  ${R}Invalid! Enter A, B, C or D${NC}"; sleep 1; continue ;;
-    esac
-    
-    local correct_answer="$(get_answer $current)"
-    ANSWERS[$current]=$correct_idx
-    
-    if [[ "$correct_idx" -eq "$correct_answer" ]]; then
-      ((score++))
-      echo -e "\n  ${G}✅ CORRECT!${NC}"
-    else
-      local correct_letter="${letters[$correct_answer]}"
-      echo -e "\n  ${R}❌ WRONG!${NC} Correct: ${G}${correct_letter}. $(get_opt $current $correct_answer)${NC}"
-    fi
-    
-    sleep 1.5
-    ((current++))
-  done
-  
-  # Results
-  show_banner
-  local pct=$((score * 100 / TOTAL_QS))
-  local rank_idx=$(get_rank $pct)
-  local rank="${RANKS[$rank_idx]}"
-  local emoji="${RANK_EMOJI[$rank_idx]}"
-  
-  echo -e "  ${Y}═══════ RESULTS ═══════${NC}\n"
-  echo -e "  ${emoji}  ${W}${rank}${NC}"
-  echo -e "  ${W}Score: ${G}${score}${NC}${W}/${TOTAL_QS} (${pct}%)${NC}\n"
-  
-  local msgs=(
-    "PERFECT! You're a Free Fire LEGEND!"
-    "Outstanding! Nearly flawless!"
-    "Great knowledge! Well done!"
-    "Good job! Keep learning!"
-    "Not bad! Study a bit more!"
-    "Room for improvement!"
-    "Keep practicing!"
-    "Time to hit the training ground!"
-  )
-  echo -e "  ${D}${msgs[$rank_idx]}${NC}\n"
-  
-  # Show missed questions
-  echo -e "  ${Y}Missed Questions:${NC}"
-  local missed=0
-  for i in $(seq 0 $((TOTAL_QS - 1))); do
-    if [[ "${ANSWERS[$i]}" -ne "$(get_answer $i)" ]]; then
-      ((missed++))
-      echo -e "  ${R}✗ Q$((i+1))${NC}: $(get_question $i)"
-      echo -e "     ${G}✓ Correct: $(get_opt $i $(get_answer $i))${NC}"
-    fi
-  done
-  [[ $missed -eq 0 ]] && echo -e "  ${G}None — Perfect score!${NC}"
-  
-  echo ""
-  read -p $'  \033[1;33mPress Enter to return to hub menu...\033[0m'
-}
-
-# Call from hub menu
-run_quiz
-BASHQUIZ
-chmod +x "$BASE_DIR/freefire_quiz.sh"
-}
-
-# ============================================================
-#  GENERATE MAIN HUB LAUNCHER
-# ============================================================
-generate_hub_menu() {
-cat > "$BASE_DIR/hub_menu.sh" << 'HUBMENU'
-#!/bin/bash
-set -euo pipefail
-
-R='\033[1;31m'; G='\033[1;32m'; Y='\033[1;33m'
-B='\033[1;34m'; M='\033[1;35m'; C='\033[1;36m'; W='\033[1;37m'; D='\033[0;37m'; NC='\033[0m'
-
-BASE_DIR="$HOME/hackerhub"
-
-while true; do
-  clear
-  echo -e "${R}╔══════════════════════════════════════════════╗${NC}"
-  echo -e "${R}║${NC}      ${W}⚡ HACKERHUB — MAIN MENU ⚡${NC}          ${R}║${NC}"
-  echo -e "${R}╚══════════════════════════════════════════════╝${NC}"
-  echo ""
-  echo -e "  ${W}[1]${NC} 🎬  FakeTube — YouTube Interface"
-  echo -e "  ${W}[2]${NC} 🔥  FreeFire MCQ Quiz (Terminal)"
-  echo -e "  ${W}[3]${NC} 🌐  Launch HTML Version (http://localhost:8080)"
-  echo -e "  ${W}[4]${NC} 📖  About / Instructions"
-  echo -e "  ${W}[5]${NC} 🚪  Exit"
-  echo ""
-  read -p $'  \033[1;33mChoose [1-5]: \033[0m' choice
-  
-  case "$choice" in
-    1) bash "$BASE_DIR/faketube.sh" ;;
-    2) bash "$BASE_DIR/freefire_quiz.sh" ;;
-    3) 
-      if [[ -f "$BASE_DIR/index.html" ]]; then
-        echo -e "\n  ${G}Starting HTTP server on port 8080...${NC}"
-        echo -e "  ${C}Open in browser:${NC} ${W}http://localhost:8080${NC}"
-        echo -e "  ${D}Press Ctrl+C to stop the server${NC}\n"
-        cd "$BASE_DIR"
-        python3 -m http.server 8080 2>/dev/null || python -m http.server 8080
-      else
-        echo -e "\n  ${R}index.html not found!${NC}"
-        sleep 1
-      fi
-      ;;
-    4)
-      clear
-      echo -e "${Y}══════════════════════════════════════════════${NC}"
-      echo -e "${W}           HACKERHUB — INSTRUCTIONS${NC}"
-      echo -e "${Y}══════════════════════════════════════════════${NC}"
-      echo ""
-      echo -e "  ${G}FakeTube${NC}: A fake YouTube interface in bash"
-      echo -e "    • Browse trending videos"
-      echo -e "    • View subscriptions"
-      echo -e "    • Search videos"
-      echo -e "    • Watch with progress bar"
-      echo ""
-      echo -e "  ${G}FreeFire Quiz${NC}: 40 MCQ questions"
-      echo -e "    • Test your Free Fire knowledge"
-      echo -e "    • Get ranked (Bronze → Grandmaster)"
-      echo -e "    • Review wrong answers"
-      echo ""
-      echo -e "  ${G}HTML Version${NC}: Full graphical version"
-      echo -e "    • Open http://localhost:8080 in browser"
-      echo -e "    • Both FakeTube + Quiz in one page"
-      echo -e "    • Particle animations, dark theme"
-      echo ""
-      read -p $'  \033[1;33mPress Enter to continue...\033[0m' ;;
-    5) echo -e "\n  ${R}Goodbye from HackerHub!${NC}"; exit 0 ;;
-    *) echo -e "\n  ${R}Invalid option${NC}"; sleep 0.8 ;;
-  esac
-done
-HUBMENU
-chmod +x "$BASE_DIR/hub_menu.sh"
-}
-
-# ============================================================
-#  MAIN INSTALL
-# ============================================================
-clear
-echo -e "${R}╔══════════════════════════════════════════════╗${NC}"
-echo -e "${R}║${NC}     ${W}⚡ HACKERHUB INSTALLER ⚡${NC}              ${R}║${NC}"
-echo -e "${R}╚══════════════════════════════════════════════╝${NC}"
-echo ""
-
-# Install dependencies
-echo -e "${Y}[*]${NC} Checking dependencies..."
-for dep in python3 python; do
-  if command -v "$dep" &>/dev/null; then
-    echo -e "  ${G}✓${NC} Python found: $dep"
-    PYTHON="$dep"
-    break
-  fi
-done
-if [[ -z "${PYTHON:-}" ]]; then
-  echo -e "  ${R}✗${NC} Python not found. Installing..."
-  pkg install python -y 2>/dev/null || apt install python3 -y 2>/dev/null || true
+# Launch browser if available and not running as root restriction issues
+if [ -n "$BROWSER_CMD" ] && [ "$EUID" -ne 0 ]; then
+    (sleep 1 && "$BROWSER_CMD" "http://localhost:$PORT" &>/dev/null &)
+elif [ "$EUID" -eq 0 ]; then
+    echo -e "${Y}[!] Note: Running as root. Open http://localhost:$PORT manually in your browser.${NC}"
 fi
 
-echo -e "${Y}[*]${NC} Generating all project files..."
-generate_html
-generate_bash_faketube
-generate_bash_quiz
-generate_hub_menu
-
-echo -e "${G}[✓]${NC} All files created in: ${W}$BASE_DIR${NC}"
-echo ""
-echo -e "  ${C}Files:${NC}"
-echo -e "    ${W}$BASE_DIR/index.html${NC}        — Full HTML (Quiz + FakeTube)"
-echo -e "    ${W}$BASE_DIR/faketube.sh${NC}       — Bash FakeTube"
-echo -e "    ${W}$BASE_DIR/freefire_quiz.sh${NC}  — Bash MCQ Quiz"
-echo -e "    ${W}$BASE_DIR/hub_menu.sh${NC}       — Main Menu Launcher"
-echo ""
-echo -e "  ${Y}To start the HTML server:${NC}"
-echo -e "    ${W}cd $BASE_DIR && python3 -m http.server 8080${NC}"
-echo -e "    ${W}Then open http://localhost:8080 in any browser${NC}"
-echo ""
-echo -e "  ${Y}To launch the terminal version:${NC}"
-echo -e "    ${W}bash $BASE_DIR/hub_menu.sh${NC}"
-echo ""
-echo -e "  ${G}Starting hub menu in 3 seconds...${NC}"
-sleep 3
-
-# Auto-launch
-cd "$BASE_DIR"
-bash "$BASE_DIR/hub_menu.sh"
+# Run python HTTP server
+if command -v python3 &>/dev/null; then
+    python3 -m http.server "$PORT"
+else
+    echo -e "${R}[!] Error: Python3 is required to run the local server.${NC}"
+    exit 1
+fi
