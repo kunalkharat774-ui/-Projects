@@ -122,7 +122,7 @@ def fetch_profile(username):
 
     data = {
         "username": profile.username,
-        "full_name": profile.full_name,
+        "full_name": _safe_full_name(profile),
         "biography": profile.biography,
         "external_url": profile.external_url,
         "followers": profile.followers,
@@ -230,8 +230,13 @@ def fetch_profile(username):
         # 4) Who tags them (real tagged posts)
         try:
             for tp in profile.get_tagged_posts():
+                owner_name = getattr(tp, 'owner', None)
+                if owner_name:
+                    owner_name = getattr(owner_name, 'username', 'unknown')
+                else:
+                    owner_name = 'unknown'
                 social["tagged"].append({
-                    "username": tp.owner.username,
+                    "username": owner_name,
                     "caption": (tp.caption or "")[:200],
                     "date_utc": tp.date_utc.isoformat() + "Z",
                     "timestamp": int(tp.date_utc.timestamp()),
