@@ -7,11 +7,16 @@
 ============================================================
 This tool connects to .onion sites through a Tor SOCKS5 proxy,
 parses their HTML with BeautifulSoup, and prints a big [!] ALERT
-on the terminal whenever the target keyword is found.
+on the terminal whenever the target keyword (e.g. your email)
+is found.
+
+It can ALSO auto-discover .onion URLs by searching Ahmia
+(a .onion search engine) for your keyword, so you do not need
+to know any onion addresses beforehand.
 
 Examples:
-    python3 darkweb_monitor.py
-    python3 darkweb_monitor.py -k "company@example.com" -s "http://xyz.onion"
+    python3 darkweb_monitor.py -k "you@example.com"
+    python3 darkweb_monitor.py -k "you@example.com" -s "http://xyz.onion"
     python3 darkweb_monitor.py -k "password[0-9]{4}" --regex
 """
 
@@ -22,7 +27,7 @@ import sys
 import time
 from collections import deque
 from datetime import datetime
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, quote
 
 import requests
 from bs4 import BeautifulSoup
@@ -47,6 +52,7 @@ REQUEST_TIMEOUT = 30        # Timeout per request (seconds)
 CRAWL_DELAY = 1.0           # Polite delay between requests
 MAX_PAGES = 50              # Default: total pages to scan
 MAX_DEPTH = 2               # Default: how deep to follow links
+AHMIA_MAX_RESULTS = 10      # Max .onion URLs to take from Ahmia search
 
 # Random User-Agent rotation — some sites block requests without a UA
 USER_AGENTS = [
@@ -55,9 +61,8 @@ USER_AGENTS = [
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15",
 ]
 
-# Default seed (.onion) URLs — WARNING: onion addresses change frequently,
-# so update these based on your own intel/research, or provide your own
-# URLs via the --seeds flag.
+# Default seed (.onion) URLs — used only if no seeds are provided and
+# Ahmia discovery is declined. Onion addresses change frequently.
 DEFAULT_SEEDS = [
     "http://juhanurmihxlp77nkq76byazcldy2hlcyfu6jdzw7c4t2h5j3k4fqd.onion",  # Ahmia (example)
     "http://darkfailenbsdla5w.onion",                                       # Dark.fail (example)
@@ -102,6 +107,32 @@ def check_tor_connection(session):
     except Exception as e:
         log(f"Unknown error during Tor check: {e}", "ERROR")
     return False
+
+
+def discover_seeds_from_ahmia(session, keyword, max_results=AHMIA_MAX_RESULTS):
+    """
+    Searches Ahmia (a .onion search engine, https://ahmia.fi) for the
+    keyword and returns discovered .onion URLs to use as crawl seeds.
+    This way the user does not need to know any onion addresses.
+    """
+    onion_urls = []
+    search_url = f"https://ahmia.fi/search/?q={quote(keyword)}"
+    log(f"Searching Ahmia for '{keyword}' ...", "INFO")
+    try:
+        resp = session.get(search_url, timeout=30)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "html.parser")
+        for a in soup.find_all("a", href=True):
+            href = a["href"].strip()
+            if href.startswith("http://") and ".onion" in href:
+                onion_urls.append(href)
+        # remove duplicates while keeping order
+        onion_urls = list(dict.fromkeys(onion_urls))
+    except requests.exceptions.ProxyError:
+        log("Proxy error during Ahmia search (is Tor running?).", "ERROR")
+    except Exception as e:
+        log(f"Ahmia search failed: {e}", "ERROR")
+    return onion_urls[:max_results]
 
 
 def fetch_page(session, url, retries=2):
@@ -247,7 +278,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Automated Dark Web Leak & Brand Mention Monitor (Tor + .onion)"
     )
-    parser.add_argument("-k", "--keyword", help="Target keyword (company name / email / regex)")
+    parser.add_argument("-k", "--keyword", help="Target keyword (email / company name / regex)")
     parser.add_argument("-s", "--seeds", nargs="+", help="Starting .onion URLs (one or more)")
     parser.add_argument("--max-pages", type=int, default=MAX_PAGES,
                         help=f"Total pages to scan (default: {MAX_PAGES})")
@@ -272,31 +303,47 @@ def main():
     # ---------- Keyword: from flag or interactive prompt ----------
     keyword = args.keyword
     if not keyword:
-        keyword = input("[?] Enter the target keyword (e.g. company@mail.com or brand name): ").strip()
+        keyword = input("[?] Enter the target keyword (e.g. you@example.com): ").strip()
         if not keyword:
             log("No keyword provided. Exiting.", "ERROR")
             sys.exit(1)
 
-    # ---------- Seeds: from flag or interactive prompt ----------
-    seeds = args.seeds or DEFAULT_SEEDS
-    if not args.seeds:
-        log(f"No --seeds provided, using default seeds: {seeds}", "INFO")
-        choice = input("[?] Enter your own .onion URLs? (comma-separated, or press Enter): ").strip()
-        if choice:
-            seeds = [u.strip() for u in choice.split(",") if u.strip().startswith("http")]
-            if not seeds:
-                log("No valid URLs found, falling back to default seeds.", "WARN")
-                seeds = DEFAULT_SEEDS
-
     log(f"Proxy      : {args.proxy}")
     log(f"Keyword    : {keyword}")
-    log(f"Max pages  : {args.max_pages}  |  Max depth: {args.max_depth}  |  Regex: {args.regex}")
 
-    # ---------- Tor connectivity check ----------
+    # ---------- Tor connectivity check (early, clear error) ----------
     session = build_session(args.proxy)
     if not check_tor_connection(session):
         log("Tor is not running — start Tor Browser or the tor daemon first.", "ERROR")
         sys.exit(1)
+
+    # ---------- Seeds: flag -> Ahmia auto-discovery -> manual -> defaults ----------
+    if args.seeds:
+        seeds = list(args.seeds)
+        log(f"Using {len(seeds)} seed(s) from --seeds.", "INFO")
+    else:
+        choice = input(f"[?] No onion URLs given. Auto-discover via Ahmia search for '{keyword}'? (y/N): ").strip().lower()
+        if choice == "y":
+            found = discover_seeds_from_ahmia(session, keyword)
+            if found:
+                seeds = found
+                log(f"Ahmia returned {len(seeds)} onion URL(s) — using them as seeds.", "OK")
+                for u in seeds:
+                    log(f"  seed: {u}", "INFO")
+            else:
+                log("Ahmia returned no results, falling back to default seeds.", "WARN")
+                seeds = DEFAULT_SEEDS
+        else:
+            choice2 = input("[?] Enter your own .onion URLs? (comma-separated, or press Enter): ").strip()
+            if choice2:
+                seeds = [u.strip() for u in choice2.split(",") if u.strip().startswith("http")]
+                if not seeds:
+                    log("No valid URLs found, falling back to default seeds.", "WARN")
+                    seeds = DEFAULT_SEEDS
+            else:
+                seeds = DEFAULT_SEEDS
+
+    log(f"Max pages  : {args.max_pages}  |  Max depth: {args.max_depth}  |  Regex: {args.regex}")
 
     # ---------- Start crawling ----------
     start = time.time()
@@ -317,6 +364,7 @@ def main():
     log(f"Scan complete — {scanned} pages scanned, "
         f"{len(matches)} match(es) found in {elapsed:.1f}s", "DONE")
     if matches:
+        print("\n[!] YOUR EMAIL WAS FOUND ON THE DARK WEB — take action:")
         for url, _ in matches:
             print(f"  [!] {url}")
         if args.output:
@@ -325,7 +373,7 @@ def main():
                     f.write(f"{datetime.now().isoformat()} | {keyword} | {url} | {snip}\n")
             log(f"Matches saved to {args.output}", "OK")
     else:
-        log("No matches found — try new seeds or a higher max-pages value.", "INFO")
+        log("No matches found on the crawled pages. Try new seeds or a higher max-pages value.", "INFO")
 
 
 if __name__ == "__main__":
